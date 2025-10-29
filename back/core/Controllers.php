@@ -5,9 +5,9 @@ namespace Core;
 abstract class Controllers{
   
   // methode json pour retourner les data en json et une réponse http claire
-  public function json(int $response_code, array $data){
+  public function json(int $response_code, array $data): bool|string{
     http_response_code($response_code);
-    json_encode($data);
+    return json_encode($data);
   }
 
   public function success($data = null, $message = 'Success') {
