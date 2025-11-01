@@ -4,34 +4,52 @@ namespace Core;
 
 use Exception;
 
-// Classe responsable de la gestion des routes individuelles, incluant la correspondance d'URL et l'exécution des actions.
-class Route{
-
+/**
+ * Classe responsable de la gestion des routes individuelles, incluant la correspondance d'URL et l'exécution des actions.
+ */
+class Route
+{
   private string $path;
-  private array $action;
+  private $action;
 
-  public function __construct($path , $action){
-    $this->path = trim($path, '/');
+  /**
+   * constructeur
+   *@param callable|array $action
+   */
+  public function __construct(string $path, callable|array $action)
+  {
+    $this->path = trim($path, "/");
     $this->action = $action;
   }
 
-  public function match($url): bool{
-    $path_replace = preg_replace('#:([\w]+)#', '[^/]+' , $this->path);
+  public function match(string $url): bool
+  {
+    $path_replace = preg_replace("#:([\w]+)#", "[^/]+", $this->path);
     $regex = preg_match("#^{$path_replace}$#i", $url, $matches);
-    if($regex){
+    if ($regex) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  public  function execute(){
-    [$controller , $method] = $this->action;
-    if(!class_exists($controller) && !method_exists($controller, $method)){
-      throw new Exception("Controller {$controller} or method {$method} not found");
+  public function execute(): mixed
+  {
+    if (is_callable($this->action)) {
+      return call_user_func($this->action);
     }
-    $newClass = new $controller;
-    return $newClass->$method();
-  }
 
+    if (is_array($this->action)) {
+      [$controller, $method] = $this->action;
+      if (!class_exists($controller) && !method_exists($controller, $method)) {
+        throw new Exception(
+          "Controller {$controller} or method {$method} not found",
+        );
+      }
+      $newClass = new $controller();
+      return $newClass->$method();
+    }
+
+    throw new Exception("Invalid action type");
+  }
 }
