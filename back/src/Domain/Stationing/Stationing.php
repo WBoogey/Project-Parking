@@ -36,34 +36,4 @@ class Stationing
         $this->customer = $customer;
         $this->parking = $parking;
     }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getStartTime(): \DateTime
-    {
-        return $this->startTime;
-    }
-
-    public function getEndTime(): \DateTime
-    {
-        return $this->endTime;
-    }
-
-    public function getStatus(): StationingStatus
-    {
-        return $this->status;
-    }
-
-    public function getCustomer(): Customer
-    {
-        return $this->customer;
-    }
-
-    public function getParking(): Parking
-    {
-        return $this->parking;
-    }
 }
