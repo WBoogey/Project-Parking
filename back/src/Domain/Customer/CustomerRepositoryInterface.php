@@ -13,8 +13,7 @@ interface CustomerRepositoryInterface
      */
     public function findById(int $id): ?Customer;
     public function findByEmail(string $email): ?Customer;
-    public function findByFirstName(string $firstName): ?Customer;
-    public function findByLastName(string $lastName): ?Customer;
+    public function findByFullName(string $firstName, string $lastName): ?Customer;
 
     /**
      * Supprimer un client du domaine

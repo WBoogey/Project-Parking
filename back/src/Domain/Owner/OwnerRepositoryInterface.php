@@ -16,8 +16,7 @@ interface OwnerRepositoryInterface
      */
     public function findById(int $id): ?Owner;
     public function findByEmail(string $email): ?Owner;
-    public function findByFirstName(string $firstName): ?Owner;
-    public function findByLastName(string $lastName): ?Owner;
+    public function findByFullName(string $firstName, string $lastName): ?Owner;
 
     /**
      * Supprimer un propriétaire du domaine
