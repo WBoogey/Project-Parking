@@ -1,35 +1,44 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use App\Domain\User\UserController;
 use Core\Router;
-use Core\Controllers;
 
-//Controllers
-$userControllers = new UserController();
+require_once __DIR__ . "/../vendor/autoload.php";
 
-//utils
-$url = $_SERVER['REQUEST_URI'];
+// CORS basique
+function cors()
+{
+  header("Access-Control-Allow-Origin: *");
+  header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+  header("Content-Type: application/json; charset=UTF-8");
+  header(
+    "Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With",
+  );
+  header("Access-Control-Max-Age: 3600"); // Cache
+
+  if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit();
+  }
+}
+cors();
+
+set_exception_handler(function ($e) {
+  http_response_code(500);
+  echo json_encode([
+    "status" => "error",
+    "message" => "Internal Server Error",
+    "details" => $e->getMessage(), // A Enlever en prod
+  ]);
+});
+
+// Initialisation du router
+$url = $_SERVER["REQUEST_URI"];
 $router = new Router($url);
 
-//e navigateur fait automatiquement une requête pour /favicon.ico et notre router n'implemente pas encore cette(je sais pas si on le fera)
-// Donc j'ai implemebté cette solution temporaire pour ne pas avoir de message d'erreur dans la console
-if ($_SERVER['REQUEST_URI'] === '/favicon.ico') {
-    http_response_code(204);
-    exit;
-}
+// Chargement de tous les fichiers de routes
+require_once __DIR__ . "/../routes/user.php";
+require_once __DIR__ . "/../routes/app.php";
 
-if ($_SERVER['REQUEST_URI'] === '/.well-known/appspecific/com.chrome.devtools.json') {
-    http_response_code(204);
-    exit;
-}
-
-//routes
-$router->get('/test', [$userControllers::class, 'user'], 'user');
-
-
-//initialisation de notre controllers(il doit étre a la fin du fichier)
+// Exécution du router
 $router->run();
-
-
+var_dump($router->run());
