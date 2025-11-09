@@ -19,19 +19,4 @@ class Schedule
         $this->openingDays = $openingDays;
         $this->openingHours = $openingHours;
     }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getOpeningDays(): string
-    {
-        return $this->openingDays;
-    }
-
-    public function getOpeningHours(): string
-    {
-        return $this->openingHours;
-    }
 }

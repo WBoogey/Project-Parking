@@ -40,39 +40,4 @@ class Subscription
         $this->rate = $rate;
         $this->weeklySlots = $weeklySlots;
     }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getCustomer(): Customer
-    {
-        return $this->customer;
-    }
-
-    public function getParking(): Parking
-    {
-        return $this->parking;
-    }
-
-    public function getStartDate(): string
-    {
-        return $this->startDate;
-    }
-
-    public function getEndDate(): string
-    {
-        return $this->endDate;
-    }
-
-    public function getRate(): float
-    {
-        return $this->rate;
-    }
-
-    public function getWeeklySlots(): array
-    {
-        return $this->weeklySlots;
-    }
 }
