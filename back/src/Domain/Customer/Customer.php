@@ -27,19 +27,4 @@ class Customer extends User
         $this->subscriptions = $subscriptions;
         $this->stationings = $stationings;
     }
-
-    public function getReservations(): array
-    {
-        return $this->reservations;
-    }
-
-    public function getSubscriptions(): array
-    {
-        return $this->subscriptions;
-    }
-
-    public function getStationings(): array
-    {
-        return $this->stationings;
-    }
 }
