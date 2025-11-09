@@ -24,24 +24,4 @@ class Reservation
         $this->parking = $parking;
         $this->customer = $customer;
     }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getInterval(): TimeInterval
-    {
-        return $this->interval;
-    }
-
-    public function getParking(): Parking
-    {
-        return $this->parking;
-    }
-
-    public function getCustomer(): Customer
-    {
-        return $this->customer;
-    }
 }
