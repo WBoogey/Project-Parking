@@ -19,13 +19,4 @@ class Owner extends User
         parent::__construct($email, $password, $firstName, $lastName);
         $this->parkings = $parkings;
     }
-    public function getParkings(): array
-    {
-        return $this->parkings;
-    }
-
-    public function addParking(Parking $parking): void
-    {
-        $this->parkings[] = $parking;
-    }
 }

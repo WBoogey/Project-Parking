@@ -28,4 +28,12 @@ interface OwnerRepositoryInterface
      * Liste des parkings d'un propriétaire
      */
     public function getParkings(Owner $owner): array;
+
+    /**
+     * Ajouter? supprimer un parking à un propriétaire
+     */
+    public function addParkingToOwner(Owner $owner, Parking $parking): void;
+
+    public function removeParkingFromOwner(Owner $owner, Parking $parking): void;
+
 }
