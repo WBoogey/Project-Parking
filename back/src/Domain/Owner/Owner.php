@@ -12,11 +12,11 @@ class Owner extends User
     public function __construct(
         string $email,
         string $password,
-        string $name,
+        string $firstName,
         string $lastName,
         array $parkings = []
     ) {
-        parent::__construct($email, $password, $name, $lastName);
+        parent::__construct($email, $password, $firstName, $lastName);
         $this->parkings = $parkings;
     }
     public function getParkings(): array
