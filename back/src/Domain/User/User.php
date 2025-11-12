@@ -40,4 +40,10 @@ class User
     {
         return $this->lastName;
     }
+
+    // Vérification du mot de passe utilisateur
+    public function verifyPassword(string $plainPassword): bool
+    {
+        return password_verify($plainPassword, $this->password);
+    }
 }
