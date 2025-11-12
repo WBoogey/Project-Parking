@@ -23,4 +23,24 @@ class Parking
         $this->capacity = $capacity;
         $this->owner = $owner;
     }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getLocation(): string
+    {
+        return $this->location;
+    }
+
+    public function getCapacity(): int
+    {
+        return $this->capacity;
+    }
+
+    public function getOwner(): Owner
+    {
+        return $this->owner;
+    }
 }

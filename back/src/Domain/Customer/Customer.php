@@ -14,6 +14,7 @@ class Customer extends User
     private array $stationings;
 
     public function __construct(
+        int $id,
         string $email,
         string $password,
         string $firstName,
@@ -22,7 +23,7 @@ class Customer extends User
         array $subscriptions = [],
         array $stationings = []
     ) {
-        parent::__construct($email, $password, $firstName, $lastName);
+        parent::__construct($id, $email, $password, $firstName, $lastName);
         $this->reservations = $reservations;
         $this->subscriptions = $subscriptions;
         $this->stationings = $stationings;

@@ -16,4 +16,19 @@ class TimeInterval
         $this->startHour = $startHour;
         $this->endHour = $endHour;
     }
+
+    public function getDayOfWeek(): string
+    {
+        return $this->dayOfWeek;
+    }
+
+    public function getStartHour(): string
+    {
+        return $this->startHour;
+    }
+
+    public function getEndHour(): string
+    {
+        return $this->endHour;
+    }
 }

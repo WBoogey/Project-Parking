@@ -42,4 +42,34 @@ class Rate
         $this->hourlyDiscount = $hourlyDiscount;
         $this->duration = $duration;
     }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getType(): RateType
+    {
+        return $this->type;
+    }
+
+    public function getCalculationRule(): string
+    {
+        return $this->calculationRule;
+    }
+
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    public function getHourlyDiscount(): ?float
+    {
+        return $this->hourlyDiscount;
+    }
+
+    public function getDuration(): ?string
+    {
+        return $this->duration;
+    }
 }
