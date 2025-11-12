@@ -3,6 +3,7 @@
 namespace App\Domain\Owner;
 
 use App\Domain\Owner\Owner;
+use App\Domain\Parking\Parking;
 
 interface OwnerRepositoryInterface
 {
