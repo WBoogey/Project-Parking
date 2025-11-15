@@ -3,6 +3,8 @@
 namespace App\Domain\Stationing;
 
 use App\Domain\Stationing\Stationing;
+use App\Domain\Parking\Parking;
+use App\Domain\Customer\Customer;
 
 interface StationingRepositoryInterface
 {
