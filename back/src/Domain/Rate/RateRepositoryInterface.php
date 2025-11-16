@@ -3,6 +3,7 @@
 namespace App\Domain\Rate;
 
 use App\Domain\Rate\Rate;
+use App\Domain\Rate\RateType;
 
 interface RateRepositoryInterface
 {
