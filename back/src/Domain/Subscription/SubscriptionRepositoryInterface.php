@@ -3,6 +3,8 @@
 namespace App\Domain\Subscription;
 
 use App\Domain\Subscription\Subscription;
+use App\Domain\Parking\Parking;
+use App\Domain\Customer\Customer;
 
 interface SubscriptionRepositoryInterface
 {
