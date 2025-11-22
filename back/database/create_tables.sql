@@ -29,3 +29,17 @@ CREATE TABLE parkings (
     owner_id INT NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE
 );
+
+-- Table des réservations (Reservation)
+CREATE TABLE reservations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    day_of_week VARCHAR(20) NOT NULL,
+    start_hour VARCHAR(10) NOT NULL,
+    end_hour VARCHAR(10) NOT NULL,
+    customer_id INT NOT NULL,
+    parking_id INT NOT NULL,
+    rate_id INT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+    FOREIGN KEY (parking_id) REFERENCES parkings(id) ON DELETE CASCADE,
+    FOREIGN KEY (rate_id) REFERENCES rates(id) ON DELETE SET NULL
+);
