@@ -20,3 +20,12 @@ CREATE TABLE owners (
     user_id INT NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Table des parkings (Parking)
+CREATE TABLE parkings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    location VARCHAR(255) NOT NULL,
+    capacity INT NOT NULL,
+    owner_id INT NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE
+);
