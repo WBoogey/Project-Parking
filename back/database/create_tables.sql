@@ -43,3 +43,18 @@ CREATE TABLE reservations (
     FOREIGN KEY (parking_id) REFERENCES parkings(id) ON DELETE CASCADE,
     FOREIGN KEY (rate_id) REFERENCES rates(id) ON DELETE SET NULL
 );
+
+-- Table des abonnements (Subscription)
+CREATE TABLE subscriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    rate FLOAT NOT NULL,
+    weekly_slots TEXT, -- Stockage JSON ou CSV des créneaux hebdomadaires
+    customer_id INT NOT NULL,
+    parking_id INT NOT NULL,
+    rate_id INT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+    FOREIGN KEY (parking_id) REFERENCES parkings(id) ON DELETE CASCADE,
+    FOREIGN KEY (rate_id) REFERENCES rates(id) ON DELETE SET NULL
+);
