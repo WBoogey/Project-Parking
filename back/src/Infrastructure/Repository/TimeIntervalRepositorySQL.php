@@ -6,7 +6,7 @@ use App\Domain\TimeInterval\TimeInterval;
 use App\Domain\TimeInterval\TimeIntervalRepositoryInterface;
 use PDO;
 
-class TimeIntervalRepository implements TimeIntervalRepositoryInterface
+class TimeIntervalRepositorySQL implements TimeIntervalRepositoryInterface
 {
     private PDO $connection;
 
