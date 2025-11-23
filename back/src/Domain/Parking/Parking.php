@@ -3,6 +3,7 @@
 namespace App\Domain\Parking;
 
 use App\Domain\Owner\Owner;
+use App\Domain\Schedule\Schedule;
 
 class Parking 
 {
@@ -16,12 +17,15 @@ class Parking
 
     private Owner $owner;
 
-    public function __construct(int $id, string $location, int $capacity, Owner $owner)
+    private array $schedules;
+
+    public function __construct(int $id, string $location, int $capacity, Owner $owner, array $schedules = [])
     {
         $this->id = $id;
         $this->location = $location;
         $this->capacity = $capacity;
         $this->owner = $owner;
+        $this->schedules = $schedules;
     }
     public function getId(): int
     {
@@ -41,5 +45,10 @@ class Parking
     public function getOwner(): Owner
     {
         return $this->owner;
+    }
+
+    public function getSchedules(): array
+    {
+        return $this->schedules;
     }
 }
