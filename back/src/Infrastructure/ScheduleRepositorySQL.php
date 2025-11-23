@@ -83,6 +83,28 @@ class ScheduleRepositorySQL implements ScheduleRepositoryInterface
 
         return $schedules;
     }
+
+    public function findByParkingId(int $parkingId): array
+    {
+        $stmt = $this->connection->prepare(
+            'SELECT s.* FROM schedules s
+             JOIN parking_schedules ps ON s.id = ps.schedule_id
+             WHERE ps.parking_id = :parking_id'
+        );
+        $stmt->execute([':parking_id' => $parkingId]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $schedules = [];
+        foreach ($results as $row) {
+            $schedules[] = new Schedule(
+                $row['id'],
+                $row['opening_days'],
+                $row['opening_hours']
+            );
+        }
+
+        return $schedules;
+    }
     
     public function delete(Schedule $schedule): void
     {
