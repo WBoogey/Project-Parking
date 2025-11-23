@@ -86,3 +86,12 @@ CREATE TABLE rates (
     hourly_discount FLOAT NULL,
     duration VARCHAR(50) NULL
 );
+
+-- Table des plages d'ouvertures (Schedule)
+CREATE TABLE schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    opening_days VARCHAR(100) NOT NULL,
+    opening_hours VARCHAR(100) NOT NULL,
+    parking_id INT NOT NULL,
+    FOREIGN KEY (parking_id) REFERENCES parkings(id) ON DELETE CASCADE
+);
