@@ -59,6 +59,7 @@ CREATE TABLE subscriptions (
     FOREIGN KEY (rate_id) REFERENCES rates(id) ON DELETE SET NULL
 );
 
+-- Table des stationnements (Stationing)
 CREATE TABLE stationings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     start_time DATETIME NOT NULL,
@@ -68,4 +69,20 @@ CREATE TABLE stationings (
     parking_id INT NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
     FOREIGN KEY (parking_id) REFERENCES parkings(id) ON DELETE CASCADE
+);
+
+-- Table des tarifs (Rate)
+CREATE TABLE rates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type ENUM(
+        'hourly',
+        'daily',
+        'weekly_subscription',
+        'monthly_subscription',
+        'yearly_subscription'
+    ) NOT NULL,
+    calculation_rule VARCHAR(255) NOT NULL,
+    price FLOAT NOT NULL,
+    hourly_discount FLOAT NULL,
+    duration VARCHAR(50) NULL
 );
