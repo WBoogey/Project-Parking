@@ -86,11 +86,3 @@ CREATE TABLE rates (
     hourly_discount FLOAT NULL,
     duration VARCHAR(50) NULL
 );
-
--- Table des intervalles (TimeInterval)
-CREATE TABLE timeintervals (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    day_of_week VARCHAR(20) NOT NULL,
-    start_hour VARCHAR(10) NOT NULL,
-    end_hour VARCHAR(10) NOT NULL
-);
