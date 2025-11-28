@@ -1,11 +1,11 @@
 import { cn } from "cn-utility";
 
-interface SpotsStatus {
+interface SpotsStatusProps {
   capacity: number;
   className?: string;
 }
 
-const SpotsStatus = ({ capacity, className }: SpotsStatus) => {
+const SpotsStatus = ({ capacity, className }: SpotsStatusProps) => {
   const message =
     capacity > 0
       ? `${capacity} ${capacity === 1 ? "place disponible" : "places disponibles"}`

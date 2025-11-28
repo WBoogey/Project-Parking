@@ -20,7 +20,7 @@ describe("SpotsStatus", () => {
       expectedClassName: "text-low-availability",
     },
   ])(
-    "should render differently according to capacity",
+    "should render capacity of $capacity as $expectedText",
     ({ capacity, expectedText, expectedClassName }) => {
       // Arrange
       render(<SpotsStatus capacity={capacity} />);
@@ -33,7 +33,7 @@ describe("SpotsStatus", () => {
   );
 
   it.each([{ capacity: -1 }, { capacity: -10 }])(
-    "should render negative capacity as full",
+    "should render capacity of $capacity as 'Complet'",
     ({ capacity }) => {
       // Arrange
       render(<SpotsStatus capacity={capacity} />);
