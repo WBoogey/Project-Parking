@@ -46,4 +46,9 @@ class User
     {
         return password_verify($plainPassword, $this->password);
     }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
 }
