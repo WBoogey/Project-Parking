@@ -1,17 +1,17 @@
 import { cn } from "cn-utility";
 
-type ButtonSize = "sm" | "md" | "lg" | "full";
+type ButtonVariant = "sm" | "md" | "lg" | "full";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  size?: ButtonSize;
+  variant?: ButtonVariant;
   onClick: () => void;
   className?: string;
 }
 
 const Button = ({
   children,
-  size = "sm",
+  variant = "sm",
   onClick,
   className,
   ...props
@@ -21,10 +21,10 @@ const Button = ({
       className={cn(
         "bg-accent text-primary rounded-2xl px-9 py-3 flex items-center justify-center gap-2.5 cursor-pointer hover:bg-accent/80 transition-colors text-sm",
         {
-          "w-32.5": size === "sm",
-          "w-96": size === "md",
-          "w-120": size === "lg",
-          "w-full": size === "full",
+          "w-32.5": variant === "sm",
+          "w-96": variant === "md",
+          "w-120": variant === "lg",
+          "w-full": variant === "full",
         },
 
         className,
