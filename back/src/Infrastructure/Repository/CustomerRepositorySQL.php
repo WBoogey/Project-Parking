@@ -24,54 +24,103 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
 
     public function save(Customer $customer): void
     {
-        $sql = "SELECT COUNT(*) FROM customers WHERE id = :id";
+        $sql = "SELECT id FROM users WHERE email = :email";
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([':id' => $customer->getId()]);
-        $exists = $stmt->fetchColumn() > 0;
+        $stmt->execute([':email' => $customer->getEmail()]);
+        $existingId = $stmt->fetchColumn();
 
-        if ($exists) {
-            $sql = "UPDATE customers SET email = :email, first_name = :first_name, last_name = :last_name WHERE id = :id";
+        if ($existingId) {
+            // Update user (infos principales)
+            $sql = "UPDATE users SET first_name = :first_name, last_name = :last_name WHERE id = :id";
+            $params = [
+                ':id' => $existingId,
+                ':first_name' => $customer->getFirstName(),
+                ':last_name' => $customer->getLastName(),
+            ];
+            $this->connection->prepare($sql)->execute($params);
+
+            // Update ou insert customer (liaison)
+            $sql = "REPLACE INTO customers (id, user_id) VALUES (:id, :user_id)";
+            $this->connection->prepare($sql)->execute([
+                ':id' => $customer->getId(),
+                ':user_id' => $existingId
+            ]);
         } else {
-            $sql = "INSERT INTO customers (id, email, first_name, last_name) VALUES (:id, :email, :first_name, :last_name)";
-        }
+            // Insert user
+            $sql = "INSERT INTO users (email, password, first_name, last_name) VALUES (:email, :password, :first_name, :last_name)";
+            $params = [
+                ':email' => $customer->getEmail(),
+                ':password' => $customer->getPassword(),
+                ':first_name' => $customer->getFirstName(),
+                ':last_name' => $customer->getLastName()
+            ];
+            $this->connection->prepare($sql)->execute($params);
+            $userId = $this->connection->lastInsertId();
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([
-            ':id' => $customer->getId(),
-            ':email' => $customer->getEmail(),
-            ':first_name' => $customer->getFirstName(),
-            ':last_name' => $customer->getLastName()
-        ]);
+            // Insert customer
+            $sql = "INSERT INTO customers (id, user_id) VALUES (:id, :user_id)";
+            $this->connection->prepare($sql)->execute([
+                ':id' => $customer->getId(),
+                ':user_id' => $userId
+            ]);
+        }
     }
 
     public function findById(int $id): ?Customer
     {
-        $sql = "SELECT * FROM customers WHERE id = :id";
+        $sql = "SELECT u.email, u.password, u.first_name, u.last_name, c.id as customer_id
+                FROM customers c
+                INNER JOIN users u ON c.user_id = u.id
+                WHERE c.id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch();
         if (!$data) return null;
-        return new Customer($data['id'], $data['email'], $data['password'], $data['first_name'], $data['last_name']);
+        return new Customer(
+            $data['customer_id'],
+            $data['email'],
+            $data['password'],
+            $data['first_name'],
+            $data['last_name']
+        );
     }
 
     public function findByEmail(string $email): ?Customer
     {
-        $sql = "SELECT * FROM customers WHERE email = :email";
+        $sql = "SELECT u.email, u.password, u.first_name, u.last_name, c.id as customer_id
+                FROM customers c
+                INNER JOIN users u ON c.user_id = u.id
+                WHERE u.email = :email";
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([':email' => $email]);
         $data = $stmt->fetch();
         if (!$data) return null;
-        return new Customer($data['id'], $data['email'], $data['password'], $data['first_name'], $data['last_name']);
+        return new Customer(
+            $data['customer_id'],
+            $data['email'],
+            $data['password'],
+            $data['first_name'],
+            $data['last_name']
+        );
     }
 
     public function findByFullName(string $firstName, string $lastName): ?Customer
     {
-        $sql = "SELECT * FROM customers WHERE first_name = :first_name AND last_name = :last_name";
+        $sql = "SELECT u.email, u.password, u.first_name, u.last_name, c.id as customer_id
+                FROM customers c
+                INNER JOIN users u ON c.user_id = u.id
+                WHERE u.first_name = :first_name AND u.last_name = :last_name";
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([':first_name' => $firstName, ':last_name' => $lastName]);
         $data = $stmt->fetch();
         if (!$data) return null;
-        return new Customer($data['id'], $data['email'], $data['password'], $data['first_name'],$data['last_name']);
+        return new Customer(
+            $data['customer_id'],
+            $data['email'],
+            $data['password'],
+            $data['first_name'],
+            $data['last_name']
+        );
     }
 
     public function delete(Customer $customer): void
