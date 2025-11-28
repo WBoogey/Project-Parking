@@ -1,8 +1,9 @@
 import { cn } from "cn-utility";
+import type { InputHTMLAttributes } from "react";
 
 type TextInputVariant = "md" | "full";
 
-interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   className?: string;
   id: string;
   variant?: TextInputVariant;

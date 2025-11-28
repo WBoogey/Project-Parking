@@ -1,9 +1,10 @@
 import { cn } from "cn-utility";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ButtonVariant = "sm" | "md" | "lg" | "full";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
   variant?: ButtonVariant;
   onClick: () => void;
   className?: string;
