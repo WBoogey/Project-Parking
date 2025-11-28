@@ -19,7 +19,7 @@ const Button = ({
   return (
     <button
       className={cn(
-        "bg-accent text-primary rounded-2xl px-9 py-3 flex items-center justify-center gap-2.5 cursor-pointer hover:bg-accent/80 transition-colors text-sm",
+        "bg-accent text-primary rounded-2xl px-9 py-3 flex items-center justify-center gap-2.5 cursor-pointer hover:bg-accent/80 transition-colors whitespace-nowrap",
         {
           "w-32.5": variant === "sm",
           "w-96": variant === "md",
