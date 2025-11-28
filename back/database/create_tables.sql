@@ -1,8 +1,8 @@
 -- Table des utilisateurs génériques
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    email VARCHAR(191) NOT NULL UNIQUE,
+    password VARCHAR(191) NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL
 );
@@ -24,7 +24,7 @@ CREATE TABLE owners (
 -- Table des parkings (Parking)
 CREATE TABLE parkings (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    location VARCHAR(255) NOT NULL,
+    location VARCHAR(191) NOT NULL,
     capacity INT NOT NULL,
     owner_id INT NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE
@@ -81,7 +81,7 @@ CREATE TABLE rates (
         'monthly_subscription',
         'yearly_subscription'
     ) NOT NULL,
-    calculation_rule VARCHAR(255) NOT NULL,
+    calculation_rule VARCHAR(191) NOT NULL,
     price FLOAT NOT NULL,
     hourly_discount FLOAT NULL,
     duration VARCHAR(50) NULL
