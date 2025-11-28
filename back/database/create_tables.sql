@@ -1,6 +1,5 @@
 -- Table des utilisateurs génériques
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE users (c
     email VARCHAR(191) NOT NULL UNIQUE,
     password VARCHAR(191) NOT NULL,
     first_name VARCHAR(100) NOT NULL,
