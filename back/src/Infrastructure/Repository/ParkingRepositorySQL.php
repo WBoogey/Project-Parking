@@ -1,90 +1,107 @@
 <?php
 
+
+
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Parking\Parking;
-use App\Domain\Owner\Owner;
+use App\Domain\Parking\ParkingId;
 use App\Domain\Parking\ParkingRepositoryInterface;
+use App\Domain\User\UserId;
 use PDO;
 
 class ParkingRepositorySQL implements ParkingRepositoryInterface
 {
-    private PDO $connection;
+  public function __construct(private readonly PDO $connection) {}
 
-    public function __construct(PDO $connection)
-    {
-        $this->connection = $connection;
+  public function save(Parking $parking): void
+  {
+    $sql = "SELECT COUNT(*) FROM parkings WHERE id = :id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":id" => $parking->getId()->toString()]);
+    $exists = (int) $stmt->fetchColumn() > 0;
+
+    if ($exists) {
+      $sql = "UPDATE parkings SET
+                location = :location,
+                capacity = :capacity,
+                owner_id = :owner_id
+              WHERE id = :id";
+    } else {
+      $sql = "INSERT INTO parkings (id, location, capacity, owner_id)
+              VALUES (:id, :location, :capacity, :owner_id)";
     }
 
-    public function save(Parking $parking): void
-    {
-        $sql = "SELECT COUNT(*) FROM parkings WHERE id = :id";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([':id' => $parking->getId()]);
-        $exists = $stmt->fetchColumn() > 0;
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([
+      ":id" => $parking->getId()->toString(),
+      ":location" => $parking->getLocation(),
+      ":capacity" => $parking->getCapacity(),
+      ":owner_id" => $parking->getOwnerId()->toString(),
+    ]);
+  }
 
-        if ($exists) {
-            $sql = "UPDATE parkings SET location = :location, capacity = :capacity, owner_id = :owner_id WHERE id = :id";
-        } else {
-            $sql = "INSERT INTO parkings (id, location, capacity, owner_id) VALUES (:id, :location, :capacity, :owner_id)";
-        }
+  public function findById(ParkingId $id): ?Parking
+  {
+    $sql = "SELECT id, location, capacity, owner_id
+            FROM parkings
+            WHERE id = :id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":id" => $id->toString()]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([
-            ':id' => $parking->getId(),
-            ':location' => $parking->getLocation(),
-            ':capacity' => $parking->getCapacity(),
-            ':owner_id' => $parking->getOwner()->getId()
-        ]);
+    if (!$data) {
+      return null;
     }
 
-    public function findById(int $id): ?Parking
-    {
-        $sql = "SELECT * FROM parkings WHERE id = :id";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        $data = $stmt->fetch();
-        if (!$data) return null;
-        $owner = new Owner($data['owner_id'], '', '', '', '');
-        return new Parking($data['id'], $data['location'], $data['capacity'], $owner);
+    return $this->hydrateParking($data);
+  }
+
+  public function findByLocation(string $location): ?Parking
+  {
+    $sql = "SELECT id, location, capacity, owner_id
+            FROM parkings
+            WHERE location = :location";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":location" => $location]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$data) {
+      return null;
     }
 
-    public function findByOwner(Owner $owner): ?array
-    {
-        $sql = "SELECT * FROM parkings WHERE owner_id = :owner_id";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([':owner_id' => $owner->getId()]);
-        $results = $stmt->fetchAll();
+    return $this->hydrateParking($data);
+  }
 
-        if (!$results) return null;
+  /**
+   * @return Parking[]
+   */
+  public function findByOwnerId(UserId $ownerId): array
+  {
+    $sql = "SELECT id, location, capacity, owner_id
+            FROM parkings
+            WHERE owner_id = :owner_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":owner_id" => $ownerId->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $parkings = [];
-        foreach ($results as $data) {
-            $parkings[] = new Parking(
-                $data['id'],
-                $data['location'],
-                $data['capacity'],
-                $owner
-            );
-        }
-        return $parkings;
-    }
+    return array_map(fn(array $data) => $this->hydrateParking($data), $results);
+  }
 
-    public function findByLocation(string $location): ?Parking
-    {
-        $sql = "SELECT * FROM parkings WHERE location = :location";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([':location' => $location]);
-        $data = $stmt->fetch();
-        if (!$data) return null;
-        $owner = new Owner($data['owner_id'], '', '', '', '');
-        return new Parking($data['id'], $data['location'], $data['capacity'], $owner);
-    }
+  public function delete(Parking $parking): void
+  {
+    $sql = "DELETE FROM parkings WHERE id = :id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":id" => $parking->getId()->toString()]);
+  }
 
-    public function delete(Parking $parking): void
-    {
-        $sql = "DELETE FROM parkings WHERE id = :id";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute([':id' => $parking->getId()]);
-    }
+  private function hydrateParking(array $data): Parking
+  {
+    return Parking::create(
+      location: $data["location"],
+      capacity: (int) $data["capacity"],
+      ownerId: UserId::fromString($data["owner_id"]),
+      id: ParkingId::fromString($data["id"]),
+    );
+  }
 }

@@ -1,21 +1,32 @@
 <?php
 
+
+
 namespace App\Domain\Subscription;
 
-use App\Domain\Subscription\Subscription;
-use App\Domain\Parking\Parking;
-use App\Domain\Customer\Customer;
+use App\Domain\Parking\ParkingId;
+use App\Domain\User\UserId;
 
 interface SubscriptionRepositoryInterface
 {
-    public function save(Subscription $subscription): void;
+  public function save(Subscription $subscription): void;
 
-    /**
-     * Récupérer un abonnement par son ID, parking, client ou prix
-     */
-    public function findById(int $id): ?Subscription;
-    public function findByParking(Parking $parking): array;
-    public function findByCustomer(Customer $customer): array;
-    public function findByPrice(float $price): array;
-    public function delete(Subscription $subscription): void;
+  public function findById(SubscriptionId $id): ?Subscription;
+
+  /**
+   * @return Subscription[]
+   */
+  public function findByParkingId(ParkingId $parkingId): array;
+
+  /**
+   * @return Subscription[]
+   */
+  public function findByUserId(UserId $userId): array;
+
+  /**
+   * @return Subscription[]
+   */
+  public function findByRate(float $rate): array;
+
+  public function delete(Subscription $subscription): void;
 }

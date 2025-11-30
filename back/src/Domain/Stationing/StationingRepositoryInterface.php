@@ -1,21 +1,33 @@
 <?php
 
+
+
 namespace App\Domain\Stationing;
 
-use App\Domain\Stationing\Stationing;
-use App\Domain\Parking\Parking;
-use App\Domain\Customer\Customer;
+use App\Domain\Parking\ParkingId;
+use App\Domain\User\UserId;
+use DateTime;
 
 interface StationingRepositoryInterface
 {
-    public function save(Stationing $stationing): void;
+  public function save(Stationing $stationing): void;
 
-    /**
-     * Récupérer un stationnement par son ID, intervalle, parking ou client
-     */
-    public function findById(int $id): ?Stationing;
-    public function findByInterval(\DateTime $startTime, \DateTime $endTime): array;
-    public function findByParking(Parking $parking): array;
-    public function findByCustomer(Customer $customer): array;
-    public function delete(Stationing $stationing): void;
+  public function findById(StationingId $id): ?Stationing;
+
+  /**
+   * @return Stationing[]
+   */
+  public function findByInterval(DateTime $startTime, DateTime $endTime): array;
+
+  /**
+   * @return Stationing[]
+   */
+  public function findByParkingId(ParkingId $parkingId): array;
+
+  /**
+   * @return Stationing[]
+   */
+  public function findByUserId(UserId $userId): array;
+
+  public function delete(Stationing $stationing): void;
 }

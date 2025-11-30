@@ -2,46 +2,61 @@
 
 namespace App\Domain\Reservation;
 
+use App\Domain\Parking\ParkingId;
 use App\Domain\TimeInterval\TimeInterval;
-use App\Domain\Parking\Parking;
-use App\Domain\User\User;
-use App\Domain\Customer\Customer;
+use App\Domain\User\UserId;
+use App\Infrastructure\Core\Domain\Entity;
 
-class Reservation
+/**
+ * @extends Entity<array{id: ReservationId, interval: TimeInterval, parkingId: ParkingId, userId: UserId}>
+ */
+class Reservation extends Entity
 {
-    private int $id;
+  private function __construct(
+    ReservationId $id,
+    TimeInterval $interval,
+    ParkingId $parkingId,
+    UserId $userId,
+  ) {
+    parent::__construct([
+      "id" => $id,
+      "interval" => $interval,
+      "parkingId" => $parkingId,
+      "userId" => $userId,
+    ]);
+  }
 
-    private TimeInterval $interval;
+  public static function create(
+    TimeInterval $interval,
+    ParkingId $parkingId,
+    UserId $userId,
+    ?ReservationId $id = null,
+  ): self {
+    return new self(
+      id: $id ?? ReservationId::generate(),
+      interval: $interval,
+      parkingId: $parkingId,
+      userId: $userId,
+    );
+  }
 
-    private Parking $parking;
+  public function getId(): ReservationId
+  {
+    return $this->props["id"];
+  }
 
-    private Customer $customer;
+  public function getInterval(): TimeInterval
+  {
+    return $this->props["interval"];
+  }
 
-    public function __construct(int $id, TimeInterval $interval, Parking $parking, Customer $customer)
-    {
-        $this->id = $id;
-        $this->interval = $interval;
-        $this->parking = $parking;
-        $this->customer = $customer;
-    }
+  public function getParkingId(): ParkingId
+  {
+    return $this->props["parkingId"];
+  }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getInterval(): TimeInterval
-    {
-        return $this->interval;
-    }
-
-    public function getParking(): Parking
-    {
-        return $this->parking;
-    }
-
-    public function getCustomer(): Customer
-    {
-        return $this->customer;
-    }
+  public function getUserId(): UserId
+  {
+    return $this->props["userId"];
+  }
 }

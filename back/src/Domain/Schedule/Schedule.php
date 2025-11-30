@@ -2,36 +2,49 @@
 
 namespace App\Domain\Schedule;
 
+use App\Infrastructure\Core\Domain\Entity;
 
-
-class Schedule
+/**
+ * @extends Entity<array{id: ScheduleId, openingDays: string, openingHours: string}>
+ */
+class Schedule extends Entity
 {
-    private int $id;
+  private function __construct(
+    ScheduleId $id,
+    string $openingDays,
+    string $openingHours,
+  ) {
+    parent::__construct([
+      "id" => $id,
+      "openingDays" => $openingDays,
+      "openingHours" => $openingHours,
+    ]);
+  }
 
-    private string $openingDays;
+  public static function create(
+    string $openingDays,
+    string $openingHours,
+    ?ScheduleId $id = null,
+  ): self {
+    return new self(
+      id: $id ?? ScheduleId::generate(),
+      openingDays: $openingDays,
+      openingHours: $openingHours,
+    );
+  }
 
-    private string $openingHours;
+  public function getId(): ScheduleId
+  {
+    return $this->props["id"];
+  }
 
+  public function getOpeningDays(): string
+  {
+    return $this->props["openingDays"];
+  }
 
-    public function __construct(int $id, string $openingDays, string $openingHours)
-    {
-        $this->id = $id;
-        $this->openingDays = $openingDays;
-        $this->openingHours = $openingHours;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getOpeningDays(): string
-    {
-        return $this->openingDays;
-    }
-
-    public function getOpeningHours(): string
-    {
-        return $this->openingHours;
-    }
+  public function getOpeningHours(): string
+  {
+    return $this->props["openingHours"];
+  }
 }

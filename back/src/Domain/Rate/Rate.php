@@ -1,75 +1,77 @@
 <?php
 
-/**
- * Classe pour gérer plusieurs types de tarification (abonnement et ponctuel)
- */
-
 namespace App\Domain\Rate;
 
-use App\Domain\Rate\RateType;
+use App\Infrastructure\Core\Domain\Entity;
 
-class Rate
+/**
+ * @extends Entity<array{id: RateId, type: RateType, calculationRule: string, price: float, hourlyDiscount: ?float, duration: ?string}>
+ */
+class Rate extends Entity
 {
-    private int $id;
-    private RateType $type;
-    private string $calculationRule;
-    private float $price;
-    
-     /**
-     * Réduction horaire applicable (en euros ou pourcentage selon la règle).
-     * Peut être null s'il n'y a pas de remise sur le tarif horaire.
-     */
-    private ?float $hourlyDiscount;
+  private function __construct(
+    RateId $id,
+    RateType $type,
+    string $calculationRule,
+    float $price,
+    ?float $hourlyDiscount,
+    ?string $duration,
+  ) {
+    parent::__construct([
+      "id" => $id,
+      "type" => $type,
+      "calculationRule" => $calculationRule,
+      "price" => $price,
+      "hourlyDiscount" => $hourlyDiscount,
+      "duration" => $duration,
+    ]);
+  }
 
-    /**
-     * Durée de validité du tarif (ex : '1 month', '1 week').
-     * Null pour les tarifs ponctuels (hors abonnement).
-     */
-    private ?string $duration;
+  public static function create(
+    RateType $type,
+    string $calculationRule,
+    float $price,
+    ?float $hourlyDiscount = null,
+    ?string $duration = null,
+    ?RateId $id = null,
+  ): self {
+    return new self(
+      id: $id ?? RateId::generate(),
+      type: $type,
+      calculationRule: $calculationRule,
+      price: $price,
+      hourlyDiscount: $hourlyDiscount,
+      duration: $duration,
+    );
+  }
 
-    public function __construct(
-        int $id,
-        RateType $type,
-        string $calculationRule,
-        float $price,
-        ?float $hourlyDiscount = null,
-        ?string $duration = null
-    ) {
-        $this->id = $id;
-        $this->type = $type;
-        $this->calculationRule = $calculationRule;
-        $this->price = $price;
-        $this->hourlyDiscount = $hourlyDiscount;
-        $this->duration = $duration;
-    }
+  public function getId(): RateId
+  {
+    return $this->props["id"];
+  }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
+  public function getType(): RateType
+  {
+    return $this->props["type"];
+  }
 
-    public function getType(): RateType
-    {
-        return $this->type;
-    }
+  public function getCalculationRule(): string
+  {
+    return $this->props["calculationRule"];
+  }
 
-    public function getCalculationRule(): string
-    {
-        return $this->calculationRule;
-    }
+  public function getPrice(): float
+  {
+    return $this->props["price"];
+  }
 
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
+  public function getHourlyDiscount(): ?float
+  {
+    return $this->props["hourlyDiscount"];
+  }
 
-    public function getHourlyDiscount(): ?float
-    {
-        return $this->hourlyDiscount;
-    }
-
-    public function getDuration(): ?string
-    {
-        return $this->duration;
-    }
+  public function getDuration(): ?string
+  {
+    return $this->props["duration"];
+  }
 }
