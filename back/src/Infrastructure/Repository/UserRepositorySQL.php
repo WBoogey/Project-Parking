@@ -4,8 +4,18 @@ namespace App\Infrastructure\Repository;
 
 use App\Domain\User\User;
 use App\Domain\User\UserId;
-use App\Domain\User\UserRepositoryInterface;
 use App\Domain\User\UserRole;
+use App\Domain\User\UserRepositoryInterface;
+use App\Domain\Parking\Parking;
+use App\Domain\Parking\ParkingId;
+use App\Domain\Reservation\Reservation;
+use App\Domain\Reservation\ReservationId;
+use App\Domain\Subscription\Subscription;
+use App\Domain\Subscription\SubscriptionId;
+use App\Domain\Stationing\Stationing;
+use App\Domain\Stationing\StationingId;
+use App\Domain\Stationing\StationingStatus;
+use App\Domain\TimeInterval\TimeInterval;
 use PDO;
 
 class UserRepositorySQL implements UserRepositoryInterface
@@ -56,7 +66,23 @@ class UserRepositorySQL implements UserRepositoryInterface
       return null;
     }
 
-    return $this->hydrateUser($data);
+    return hydrateUser($data);
+  }
+
+  public function findByEmail(string $email): ?User
+  {
+    $sql = "SELECT id, email, password, first_name, last_name, role
+            FROM users
+            WHERE email = :email";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":email" => $email]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$data) {
+      return null;
+    }
+
+    return hydrateUser($data);
   }
 
   public function findByFullName(string $firstName, string $lastName): ?User
@@ -75,23 +101,7 @@ class UserRepositorySQL implements UserRepositoryInterface
       return null;
     }
 
-    return $this->hydrateUser($data);
-  }
-
-  public function findByEmail(string $email): ?User
-  {
-    $sql = "SELECT id, email, password, first_name, last_name, role
-            FROM users
-            WHERE email = :email";
-    $stmt = $this->connection->prepare($sql);
-    $stmt->execute([":email" => $email]);
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$data) {
-      return null;
-    }
-
-    return $this->hydrateUser($data);
+    return hydrateUser($data);
   }
 
   /**
@@ -106,7 +116,7 @@ class UserRepositorySQL implements UserRepositoryInterface
     $stmt->execute([":role" => $role->value]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    return array_map(fn(array $data) => $this->hydrateUser($data), $results);
+    return array_map(fn(array $data) => hydrateUser($data), $results);
   }
 
   public function emailExists(string $email): bool
@@ -125,15 +135,131 @@ class UserRepositorySQL implements UserRepositoryInterface
     $stmt->execute([":id" => $user->getId()->toString()]);
   }
 
-  private function hydrateUser(array $data): User
+  //Owner
+
+  /**
+   * @return Parking[]
+   */
+  public function getParkings(User $owner): array
   {
-    return User::create(
-      email: $data["email"],
-      password: $data["password"],
-      firstName: $data["first_name"],
-      lastName: $data["last_name"],
-      role: UserRole::from($data["role"]),
-      id: UserId::fromString($data["id"]),
+    $sql = "SELECT id, location, capacity, owner_id
+            FROM parkings
+            WHERE owner_id = :owner_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":owner_id" => $owner->getId()->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(
+      fn(array $data) => Parking::create(
+        location: $data["location"],
+        capacity: (int) $data["capacity"],
+        ownerId: UserId::fromString($data["owner_id"]),
+        id: ParkingId::fromString($data["id"]),
+      ),
+      $results,
+    );
+  }
+
+  public function addParkingToOwner(User $owner, Parking $parking): void
+  {
+    $sql = "UPDATE parkings SET owner_id = :owner_id WHERE id = :id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([
+      ":id" => $parking->getId()->toString(),
+      ":owner_id" => $owner->getId()->toString(),
+    ]);
+  }
+
+  public function removeParkingFromOwner(
+    User $owner,
+    ParkingId $parkingId,
+  ): void {
+    $sql =
+      "UPDATE parkings SET owner_id = NULL WHERE id = :id AND owner_id = :owner_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([
+      ":id" => $parkingId->toString(),
+      ":owner_id" => $owner->getId()->toString(),
+    ]);
+  }
+
+  //Customer
+
+  /**
+   * @return Reservation[]
+   */
+  public function getReservations(User $customer): array
+  {
+    $sql = "SELECT id, day_of_week, start_hour, end_hour, user_id, parking_id
+            FROM reservations
+            WHERE user_id = :user_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":user_id" => $customer->getId()->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(
+      fn(array $data) => Reservation::create(
+        interval: new TimeInterval(
+          $data["day_of_week"],
+          $data["start_hour"],
+          $data["end_hour"],
+        ),
+        parkingId: ParkingId::fromString($data["parking_id"]),
+        userId: UserId::fromString($data["user_id"]),
+        id: ReservationId::fromString($data["id"]),
+      ),
+      $results,
+    );
+  }
+
+  /**
+   * @return Subscription[]
+   */
+  public function getSubscriptions(User $customer): array
+  {
+    $sql = "SELECT id, start_date, end_date, rate, weekly_slots, user_id, parking_id
+            FROM subscriptions
+            WHERE user_id = :user_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":user_id" => $customer->getId()->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(
+      fn(array $data) => Subscription::create(
+        userId: UserId::fromString($data["user_id"]),
+        parkingId: ParkingId::fromString($data["parking_id"]),
+        startDate: $data["start_date"],
+        endDate: $data["end_date"],
+        rate: (float) $data["rate"],
+        weeklySlots: json_decode($data["weekly_slots"] ?? "[]", true),
+        id: SubscriptionId::fromString($data["id"]),
+      ),
+      $results,
+    );
+  }
+
+  /**
+   * @return Stationing[]
+   */
+  public function getStationings(User $customer): array
+  {
+    $sql = "SELECT id, start_time, end_time, status, user_id, parking_id
+            FROM stationings
+            WHERE user_id = :user_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":user_id" => $customer->getId()->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(
+      fn(array $data) => Stationing::create(
+        startTime: new \DateTime($data["start_time"]),
+        endTime: new \DateTime($data["end_time"]),
+        status: StationingStatus::from($data["status"]),
+        userId: UserId::fromString($data["user_id"]),
+        parkingId: ParkingId::fromString($data["parking_id"]),
+        id: StationingId::fromString($data["id"]),
+      ),
+      $results,
     );
   }
 }

@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Parking\Parking;

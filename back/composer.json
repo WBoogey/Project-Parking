@@ -6,7 +6,8 @@
       "App\\": "src/"
     },
     "files": [
-      "src/Infrastructure/Core/Config/bootstrap.php"
+      "src/Infrastructure/Core/Config/bootstrap.php",
+      "src/Helper/helpers.php"
     ]
   },
   "require-dev": {
