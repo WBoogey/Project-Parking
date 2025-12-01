@@ -1,6 +1,11 @@
 <?php
 
 use App\Infrastructure\Core\Config\Router;
+use App\Infrastructure\Core\Config\Config;
+use App\Infrastructure\Core\Config\Database;
+use App\Infrastructure\Middleware\MiddlewareHandler;
+use App\Infrastructure\Repository\UserRepositorySQL;
+use App\Infrastructure\adaptaters\FirebaseJwtService;
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
@@ -32,9 +37,23 @@ set_exception_handler(function ($e) {
   ]);
 });
 
+// Configuration et dépendances globales
+$config = Config::getInstance();
+$pdo = Database::getInstance()->getConnection();
+
+$userRepository = new UserRepositorySQL($pdo);
+$jwtService = new FirebaseJwtService(
+  secret: $config->get("jwt.secret_key"),
+  expirationSeconds: $config->get("jwt.expiration"),
+);
+
+// Middleware handler
+$middlewareHandler = new MiddlewareHandler($jwtService, $userRepository);
+
 // Initialisation du router
 $url = $_SERVER["REQUEST_URI"];
 $router = new Router($url);
+$router->setMiddlewareHandler($middlewareHandler);
 
 // Chargement des routes
 require_once __DIR__ . "/../src/routes/user.php";

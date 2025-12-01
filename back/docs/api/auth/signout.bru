@@ -1,24 +1,13 @@
 meta {
-  name: Signin
+  name: Signout
   type: http
-  seq: 2
+  seq: 3
 }
 
 post {
-  url: {{baseUrl}}/api/auth/signin
-  body: json
+  url: {{baseUrl}}/api/auth/signout
+  body: none
   auth: none
-}
-
-headers {
-  Content-Type: application/json
-}
-
-body:json {
-  {
-    "email": "test@example.com",
-    "password": "password123"
-  }
 }
 
 script:post-response{
@@ -26,7 +15,7 @@ script:post-response{
 }
 
 tests {
-  test("should return 200 on successful login", function() {
+  test("should return 200", function() {
     expect(res.status).to.equal(200);
   });
 
@@ -34,11 +23,10 @@ tests {
     expect(res.body.status).to.equal("success");
   });
 
-  test("should set auth cookie", function() {
+  test("should clear auth cookie", function() {
     const cookies = res.headers["set-cookie"];
     expect(cookies).to.be.an("array");
     const authCookie = cookies.find(c => c.startsWith("auth_token="));
     expect(authCookie).to.exist;
-    expect(authCookie).to.include("HttpOnly");
   });
 }

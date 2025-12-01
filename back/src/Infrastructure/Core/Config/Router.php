@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Core\Config;
 
+use App\Infrastructure\Middleware\MiddlewareHandler;
 use Exception;
 
 /**
@@ -25,11 +26,24 @@ class Router
   private array $namedList = [];
 
   /**
+   * @var MiddlewareHandler|null
+   */
+  private ?MiddlewareHandler $middlewareHandler = null;
+
+  /**
    * @param string $url
    */
   public function __construct(string $url)
   {
     $this->url = trim($url, "/");
+  }
+
+  /**
+   * @param MiddlewareHandler $handler
+   */
+  public function setMiddlewareHandler(MiddlewareHandler $handler): void
+  {
+    $this->middlewareHandler = $handler;
   }
 
   /**
@@ -103,7 +117,13 @@ class Router
     ?string $name = null,
   ): void {
     $route = new Route($path, $action);
+
+    if ($this->middlewareHandler !== null) {
+      $route->setMiddlewareHandler($this->middlewareHandler);
+    }
+
     $this->routes[$method][] = $route;
+
     if ($name) {
       $this->namedList[$name] = $route;
     }
