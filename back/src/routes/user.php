@@ -7,25 +7,16 @@ use App\Domain\User\Application\SigninWithEmailUser;
 use App\Infrastructure\Repository\UserRepositorySQL;
 use App\Infrastructure\adaptaters\FirebaseJwtService;
 use App\Infrastructure\Core\Config\Database;
-
-// Configuration DB
-$dbConfig = [
-  "host" => $_ENV["DB_HOST"] ?? "localhost",
-  "port" => (int) ($_ENV["DB_PORT"] ?? 3306),
-  "database" => $_ENV["DB_NAME"] ?? "parking",
-  "username" => $_ENV["DB_USER"] ?? "root",
-  "password" => $_ENV["DB_PASSWORD"] ?? "",
-  "charset" => "utf8mb4",
-];
+use App\Infrastructure\Core\Config\Config;
 
 // Dépendances
-$db = Database::getInstance($dbConfig);
-$pdo = $db->getConnection();
+$config = Config::getInstance();
+$pdo = Database::getInstance()->getConnection();
 
 $userRepository = new UserRepositorySQL($pdo);
 $jwtService = new FirebaseJwtService(
-  secret: $_ENV["JWT_SECRET"] ?? "your-secret-key",
-  expirationSeconds: (int) ($_ENV["JWT_EXPIRATION"] ?? 3600),
+  secret: $config->get("jwt.secret_key"),
+  expirationSeconds: $config->get("jwt.expiration"),
 );
 
 $signupUseCase = new SignupWithEmailUser($userRepository, $jwtService);

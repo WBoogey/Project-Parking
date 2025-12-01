@@ -1,13 +1,8 @@
 <?php
 
 use App\Infrastructure\Core\Config\Router;
-use Dotenv\Dotenv;
 
 require_once __DIR__ . "/../vendor/autoload.php";
-
-// Chargement des variables d'environnement
-$dotenv = Dotenv::createImmutable(__DIR__ . "/..");
-$dotenv->safeLoad();
 
 // CORS basique
 function cors()
