@@ -92,10 +92,16 @@ class Database
 
     $sql = file_get_contents($sqlFile);
 
+    // Supprimer les commentaires SQL (lignes commençant par --)
+    $sql = preg_replace('/--.*$/m', "", $sql);
+
+    // Supprimer les commentaires multi-lignes /* */
+    $sql = preg_replace("/\/\*.*?\*\//s", "", $sql);
+
     // Séparer les requêtes par point-virgule
     $statements = array_filter(
       array_map("trim", explode(";", $sql)),
-      fn($s) => !empty($s) && !str_starts_with($s, "--"),
+      fn($s) => !empty($s),
     );
 
     foreach ($statements as $statement) {
