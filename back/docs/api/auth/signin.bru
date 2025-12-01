@@ -16,9 +16,13 @@ headers {
 
 body:json {
   {
-    "email": "john.doe@example.com",
+    "email": "test4@example.com",
     "password": "password123"
   }
+}
+
+script:post-response {
+  console.log("response", res.body);
 }
 
 tests {
