@@ -14,6 +14,7 @@ const SpotsStatus = ({ capacity, className }: SpotsStatusProps) => {
   return (
     <div
       className={cn(
+        "font-semibold",
         capacity > 0 ? "text-low-availability" : "text-no-availability",
         className,
       )}

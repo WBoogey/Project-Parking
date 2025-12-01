@@ -1,31 +1,26 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import SeePassword from "./SeePassword";
 import userEvent from "@testing-library/user-event";
 
 describe("SeePassword", () => {
-  it("should render with default visible state / visible state is false", () => {
-    // Arrange
-    const setVisible = vi.fn();
-    const { container } = render(
-      <SeePassword visible={false} setVisible={setVisible} />,
-    );
+  it.each([
+    { currentState: false, expectedLabel: "Afficher le mot de passe" },
+    { currentState: true, expectedLabel: "Masquer le mot de passe" },
+  ])(
+    "should have label $expectedLabel when visible is $currentState",
+    ({ currentState, expectedLabel }) => {
+      // Arrange
+      const setVisible = vi.fn();
+      const { container } = render(
+        <SeePassword visible={currentState} setVisible={setVisible} />,
+      );
 
-    // Assert
-    expect(container).toBeInTheDocument();
-    expect(container.querySelector("svg")).toHaveClass("lucide-eye-off");
-  });
-
-  it("should render with opened Eye icon when visible is true", () => {
-    // Arrange
-    const setVisible = vi.fn();
-    const { container } = render(
-      <SeePassword visible setVisible={setVisible} />,
-    );
-
-    // Assert
-    expect(container.querySelector("svg")).toHaveClass("lucide-eye");
-  });
+      // Assert
+      expect(container).toBeInTheDocument();
+      expect(screen.getByLabelText(expectedLabel));
+    },
+  );
 
   it.each([
     { currentState: true, expected: false },
