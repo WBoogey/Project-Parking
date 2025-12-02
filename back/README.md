@@ -19,8 +19,8 @@ La structure complète des tables SQL dans `database/create_tables.sql`
 
 ## Suite du projet
 
-- Implémenter la couche Application (Use Cases) dans `Application/UseCase/`
-- Ajouter le système d’authentification (tokens, sécurité)
+- Use Case
+- Auth système, Middleware, token
 - Compléter les tests (use cases, intégration)
 
 ## Conseils
