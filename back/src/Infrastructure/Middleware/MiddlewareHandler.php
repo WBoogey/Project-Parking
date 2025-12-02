@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Middleware;
 
-use App\Domain\User\JwtServiceInterface;
+use App\Domain\Port\JwtServiceInterface;
 use App\Domain\User\UserRepositoryInterface;
 use App\Domain\User\UserId;
 use ReflectionMethod;
@@ -14,6 +14,9 @@ class MiddlewareHandler
     private readonly UserRepositoryInterface $userRepository,
   ) {}
 
+  /**
+   * @return array<string,bool>|<missing>|array<string,mixed>
+   */
   public function handle(object $controller, string $method): array
   {
     $reflection = new ReflectionMethod($controller, $method);
@@ -85,7 +88,9 @@ class MiddlewareHandler
 
     return ["success" => true];
   }
-
+  /**
+   * @return array<string,mixed>|array<string,bool>
+   */
   private function authenticate(): array
   {
     $token = $this->extractToken();

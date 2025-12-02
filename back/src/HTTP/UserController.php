@@ -10,6 +10,7 @@ use App\Infrastructure\Middleware\RequireCustomer;
 use App\Services\UserService;
 use App\Domain\User\Application\Exception\UserAlreadyExistsException;
 use App\Domain\User\Application\Exception\InvalidCredentialsException;
+use App\Domain\User\Application\Exception\UserNotFoundException;
 use App\Domain\User\UserRole;
 
 class UserController extends Controllers
@@ -172,6 +173,96 @@ class UserController extends Controllers
       ],
       message: "User profile",
     );
+  }
+
+  #[RequireAuth]
+  public function updateProfile(): bool|string
+  {
+    $user = AuthContext::getUser();
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    if (!$input) {
+      return $this->json(400, [
+        "type" => "https://httpstatuses.com/400",
+        "title" => "Bad Request",
+        "detail" => "Invalid JSON body",
+        "status" => 400,
+      ]);
+    }
+
+    $email = isset($input["email"]) ? $this->sanitize($input["email"]) : null;
+    $firstName = isset($input["firstName"])
+      ? $this->sanitize($input["firstName"])
+      : null;
+    $lastName = isset($input["lastName"])
+      ? $this->sanitize($input["lastName"])
+      : null;
+    $password = $input["password"] ?? null;
+
+    if ($email !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      return $this->json(422, [
+        "type" => "https://httpstatuses.com/422",
+        "title" => "Unprocessable Entity",
+        "detail" => "Invalid email format",
+        "status" => 422,
+      ]);
+    }
+
+    try {
+      $updatedUser = $this->userService->updateProfile(
+        userId: $user->getId(),
+        email: $email,
+        firstName: $firstName,
+        lastName: $lastName,
+        password: $password,
+      );
+
+      return $this->success(
+        data: [
+          "id" => $updatedUser->getId()->toString(),
+          "email" => $updatedUser->getEmail(),
+          "firstName" => $updatedUser->getFirstName(),
+          "lastName" => $updatedUser->getLastName(),
+          "role" => $updatedUser->getRole()->value,
+        ],
+        message: "Profile updated successfully",
+      );
+    } catch (UserAlreadyExistsException $e) {
+      return $this->json(409, [
+        "type" => "https://httpstatuses.com/409",
+        "title" => "Conflict",
+        "detail" => $e->getMessage(),
+        "status" => 409,
+      ]);
+    } catch (UserNotFoundException $e) {
+      return $this->json(404, [
+        "type" => "https://httpstatuses.com/404",
+        "title" => "Not Found",
+        "detail" => $e->getMessage(),
+        "status" => 404,
+      ]);
+    }
+  }
+
+  #[RequireAuth]
+  public function deleteProfile(): bool|string
+  {
+    $user = AuthContext::getUser();
+
+    try {
+      $this->userService->deleteUser($user->getId());
+      $this->clearAuthCookie();
+      AuthContext::clear();
+
+      return $this->success(data: [], message: "Account deleted successfully");
+    } catch (UserNotFoundException $e) {
+      return $this->json(404, [
+        "type" => "https://httpstatuses.com/404",
+        "title" => "Not Found",
+        "detail" => $e->getMessage(),
+        "status" => 404,
+      ]);
+    }
   }
 
   #[RequireOwner]
