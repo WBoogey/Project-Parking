@@ -1,0 +1,55 @@
+meta {
+  name: Add Parking
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/owner/parkings
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "location": "123 Main Street, Paris",
+    "capacity": 50
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+  if (res.body.data && res.body.data.id) {
+    bru.setVar("parkingId", res.body.data.id);
+  }
+}
+
+tests {
+  test("should return 201 on successful creation", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return parking data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("location");
+    expect(res.body.data).to.have.property("capacity");
+    expect(res.body.data).to.have.property("ownerId");
+  });
+
+  test("should have correct parking values", function() {
+    expect(res.body.data.location).to.equal("123 Main Street, Paris");
+    expect(res.body.data.capacity).to.equal(50);
+  });
+
+  test("should return creation message", function() {
+    expect(res.body.message).to.equal("Parking added successfully");
+  });
+}

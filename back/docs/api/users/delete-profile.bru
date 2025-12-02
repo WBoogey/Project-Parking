@@ -1,0 +1,35 @@
+meta {
+  name: Delete Profile
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/users/me
+  body: none
+  auth: none
+}
+
+tests {
+  test("should return 200 on successful deletion", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return deletion confirmation message", function() {
+    expect(res.body.message).to.equal("Account deleted successfully");
+  });
+
+  test("should clear auth cookie", function() {
+    const cookies = res.headers["set-cookie"];
+    if (cookies) {
+      const authCookie = cookies.find(c => c.startsWith("auth_token="));
+      if (authCookie) {
+        expect(authCookie).to.include("expires=");
+      }
+    }
+  });
+}
