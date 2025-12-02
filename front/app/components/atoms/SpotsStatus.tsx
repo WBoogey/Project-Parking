@@ -12,15 +12,15 @@ const SpotsStatus = ({ capacity, className }: SpotsStatusProps) => {
       : "Complet";
 
   return (
-    <div
+    <p
       className={cn(
-        "font-semibold",
+        "font-semibold text-xs",
         capacity > 0 ? "text-low-availability" : "text-no-availability",
         className,
       )}
     >
       {message}
-    </div>
+    </p>
   );
 };
 

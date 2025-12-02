@@ -1,6 +1,5 @@
+import type { FrequencyType } from "@/types/SpotsTypes";
 import { cn } from "cn-utility";
-
-type FrequencyType = "weekly" | "monthly" | "yearly";
 
 interface PriceIndicatorProps {
   price: number;
@@ -16,9 +15,9 @@ const PriceIndicator = ({
   className,
 }: PriceIndicatorProps) => {
   const frequencyDisplay = {
-    weekly: "semaine",
     monthly: "mois",
-    yearly: "an",
+    daily: "jour",
+    hourly: "heure",
   };
 
   return (

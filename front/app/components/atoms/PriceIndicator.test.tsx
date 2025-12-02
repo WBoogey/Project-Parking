@@ -21,16 +21,16 @@ describe("PriceIndicator", () => {
 
   it.each([
     {
-      frequency: "weekly" as const,
-      expected: "Par semaine",
-    },
-    {
       frequency: "monthly" as const,
       expected: "Par mois",
     },
     {
-      frequency: "yearly" as const,
-      expected: "Par an",
+      frequency: "daily" as const,
+      expected: "Par jour",
+    },
+    {
+      frequency: "hourly" as const,
+      expected: "Par heure",
     },
   ])(
     "should render $frequency frequency as $expected",
