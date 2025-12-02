@@ -2,7 +2,7 @@
 
 namespace App\Domain\User\Application;
 
-use App\Domain\User\JwtServiceInterface;
+use App\Domain\Port\JwtServiceInterface;
 use App\Domain\User\UserRepositoryInterface;
 use App\Domain\User\Application\Exception\InvalidCredentialsException;
 
