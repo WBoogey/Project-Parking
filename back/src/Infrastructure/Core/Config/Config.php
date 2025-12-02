@@ -31,6 +31,10 @@ class Config
         "url" => $_ENV["APP_URL"] ?? "http://localhost:8000",
         "env" => $_ENV["APP_ENV"] ?? "development",
       ],
+      "stripe" => [
+        "public_key" => $_ENV["STRIPE_PUBLIC_KEY"] ?? "",
+        "secret_key" => $_ENV["STRIPE_SECRET_KEY"] ?? "",
+      ],
     ];
   }
 
