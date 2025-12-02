@@ -1,0 +1,45 @@
+meta {
+  name: Get Stationings
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/customer/stationings
+  body: none
+  auth: none
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 when authenticated as customer", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return stationings array", function() {
+    expect(res.body.data).to.be.an("array");
+  });
+
+  test("should have correct message", function() {
+    expect(res.body.message).to.equal("Customer stationings");
+  });
+
+  test("each stationing should have required fields", function() {
+    if (res.body.data.length > 0) {
+      const stationing = res.body.data[0];
+      expect(stationing).to.have.property("id");
+      expect(stationing).to.have.property("startTime");
+      expect(stationing).to.have.property("endTime");
+      expect(stationing).to.have.property("status");
+      expect(stationing).to.have.property("parkingId");
+      expect(stationing).to.have.property("userId");
+    }
+  });
+}
