@@ -1,0 +1,39 @@
+meta {
+  name: Remove Parking
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/owner/parkings
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "parkingId": "{{parkingId}}"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 on successful removal", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return confirmation message", function() {
+    expect(res.body.message).to.equal("Parking removed successfully");
+  });
+}

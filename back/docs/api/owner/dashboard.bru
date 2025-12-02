@@ -1,0 +1,38 @@
+meta {
+  name: Owner Dashboard
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/owner/dashboard
+  body: none
+  auth: none
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 when authenticated as owner", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return dashboard data", function() {
+    expect(res.body.data).to.have.property("message");
+    expect(res.body.data).to.have.property("userId");
+  });
+
+  test("should have correct welcome message", function() {
+    expect(res.body.data.message).to.equal("Welcome to owner dashboard");
+  });
+
+  test("should have correct message", function() {
+    expect(res.body.message).to.equal("Owner dashboard");
+  });
+}
