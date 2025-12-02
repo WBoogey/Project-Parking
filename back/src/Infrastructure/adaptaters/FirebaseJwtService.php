@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\adaptaters;
 
-use App\Domain\User\JwtServiceInterface;
+use App\Domain\Port\JwtServiceInterface;
 use App\Domain\User\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;

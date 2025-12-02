@@ -4,12 +4,23 @@ use App\HTTP\UserController;
 use App\Services\UserService;
 use App\Domain\User\Application\SignupWithEmailUser;
 use App\Domain\User\Application\SigninWithEmailUser;
+use App\Domain\User\Application\GetUserProfile;
+use App\Domain\User\Application\UpdateUserProfile;
+use App\Domain\User\Application\DeleteUser;
 
-// Dépendances (réutilisées depuis index.php via $userRepository et $jwtService)
 $signupUseCase = new SignupWithEmailUser($userRepository, $jwtService);
 $signinUseCase = new SigninWithEmailUser($userRepository, $jwtService);
+$getUserProfileUseCase = new GetUserProfile($userRepository);
+$updateUserProfileUseCase = new UpdateUserProfile($userRepository);
+$deleteUserUseCase = new DeleteUser($userRepository);
 
-$userService = new UserService($signupUseCase, $signinUseCase);
+$userService = new UserService(
+  $signupUseCase,
+  $signinUseCase,
+  $getUserProfileUseCase,
+  $updateUserProfileUseCase,
+  $deleteUserUseCase,
+);
 $userController = new UserController($userService);
 
 // Routes Auth (publiques)
@@ -29,8 +40,20 @@ $router->post(
   "api.auth.signout",
 );
 
-// Routes protégées
+// Routes User (protégées)
 $router->get("/api/users/me", [$userController, "me"], "api.users.me");
+$router->put(
+  "/api/users/me",
+  [$userController, "updateProfile"],
+  "api.users.update",
+);
+$router->delete(
+  "/api/users/me",
+  [$userController, "deleteProfile"],
+  "api.users.delete",
+);
+
+// Dashboards
 $router->get(
   "/api/owner/dashboard",
   [$userController, "ownerDashboard"],
