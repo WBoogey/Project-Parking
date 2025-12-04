@@ -1,7 +1,6 @@
+import type { TextInputVariant } from "@/types/ComponentTypes";
 import { cn } from "cn-utility";
 import type { InputHTMLAttributes } from "react";
-
-type TextInputVariant = "md" | "full";
 
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   className?: string;
@@ -23,7 +22,7 @@ const TextInput = ({
       className={cn(
         "text-secondary border-2 border-tertiary focus:outline-secondary rounded-xl p-2.5 placeholder:text-tertiary",
         {
-          "w-59": variant === "md",
+          "w-64": variant === "md",
           "w-full": variant === "full",
         },
         className,

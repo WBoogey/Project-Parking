@@ -3,6 +3,7 @@
 
 @theme {
   --font-sans: "Roboto", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --color-primary: #fcfcfc;
   --color-secondary: #1b3d61;
