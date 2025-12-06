@@ -86,18 +86,16 @@ describe("SelectInput", () => {
     const user = userEvent.setup();
     const triggerButton = screen.getByTestId("select-trigger");
 
-    // Act 1 - Open dropdown
+    // Act & Assert 1
     await user.click(triggerButton);
 
-    // Assert 1 - Dropdown is open
     const openDropdown = container.querySelector(".absolute.min-w-52");
     expect(openDropdown).toHaveClass("opacity-100");
 
-    // Act 2 - Click outside
+    // Act & Assert 2
     const outsideElement = screen.getByTestId("outside");
     await user.click(outsideElement);
 
-    // Assert 2 - Dropdown is closed
     const closedDropdown = container.querySelector(".absolute.min-w-52");
     expect(closedDropdown).toHaveClass("max-h-0 opacity-0 pointer-events-none");
   });

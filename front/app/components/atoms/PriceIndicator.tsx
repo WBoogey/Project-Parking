@@ -24,7 +24,7 @@ const PriceIndicator = ({
     <div
       className={cn(
         "flex items-start font-semibold text-sm text-secondary",
-        variant === "inline" ? "gap-1" : "flex-col justify-between h-full",
+        variant === "inline" ? "gap-1" : "flex-col justify-between",
         className,
       )}
     >

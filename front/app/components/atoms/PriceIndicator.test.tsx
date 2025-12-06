@@ -10,11 +10,7 @@ describe("PriceIndicator", () => {
     );
 
     // Assert
-    expect(container.firstChild).toHaveClass(
-      "flex-col",
-      "justify-between",
-      "h-full",
-    );
+    expect(container.firstChild).toHaveClass("flex-col", "justify-between");
     expect(container).toHaveTextContent("100EUR");
     expect(container).toHaveTextContent("Par mois");
   });
