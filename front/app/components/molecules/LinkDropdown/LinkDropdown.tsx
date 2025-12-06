@@ -1,6 +1,6 @@
 import { PopiconsChevronBottomLine } from "@popicons/react";
 import { cn } from "cn-utility";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import DropdownList from "./DropdownList";
 import type {
   DropdownFullListType,
@@ -19,11 +19,26 @@ const LinkDropdown = ({
   dropdownElements,
 }: LinkDropdownProps) => {
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className={cn("relative", className)}>
+    <div ref={dropdownRef} className={cn("relative", className)}>
       <button
-        className="flex items-center gap-1 p-1 cursor-pointer"
+        className="flex items-center gap-1 p-1 cursor-pointer text-secondary hover:underline"
         onClick={() => setOpen(!open)}
       >
         {title}

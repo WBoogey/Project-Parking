@@ -1,10 +1,10 @@
+import type { ButtonSize, ButtonVariant } from "@/types/ComponentTypes";
 import { cn } from "cn-utility";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type ButtonVariant = "sm" | "md" | "lg" | "full";
-
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
+  size?: ButtonSize;
   variant?: ButtonVariant;
   onClick: () => void;
   className?: string;
@@ -12,7 +12,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = ({
   children,
-  variant = "sm",
+  size = "sm",
+  variant = "default",
   onClick,
   className,
   ...props
@@ -20,14 +21,18 @@ const Button = ({
   return (
     <button
       className={cn(
-        "bg-accent text-primary rounded-2xl px-9 py-3 flex items-center justify-center gap-2.5 cursor-pointer hover:bg-accent/80 transition-colors whitespace-nowrap",
+        "cursor-pointer whitespace-nowrap",
         {
-          "w-32.5": variant === "sm",
-          "w-96": variant === "md",
-          "w-120": variant === "lg",
-          "w-full": variant === "full",
+          "rounded-2xl px-9 py-3 flex items-center justify-center gap-2.5 transition-colors text-primary bg-accent hover:bg-accent/80":
+            variant === "default",
+          "text-secondary hover:underline": variant === "plain",
         },
-
+        variant === "default" && {
+          "w-32.5": size === "sm",
+          "w-96": size === "md",
+          "w-120": size === "lg",
+          "w-full": size === "full",
+        },
         className,
       )}
       onClick={onClick}

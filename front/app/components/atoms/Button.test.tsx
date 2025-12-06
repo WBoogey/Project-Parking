@@ -23,10 +23,10 @@ describe("Button", () => {
     expect(handleClick).toBeCalled();
   });
 
-  it("should apply correct variant", () => {
+  it("should apply correct size", () => {
     // Arrange
     render(
-      <Button variant="lg" onClick={() => {}}>
+      <Button size="lg" onClick={() => {}}>
         Click me
       </Button>,
     );
