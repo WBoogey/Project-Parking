@@ -8,15 +8,22 @@ interface SelectInputProps {
   placeholder: string;
   choices: string[];
   variant?: SelectVariantType;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 const SelectInput = ({
   placeholder,
   choices,
   variant = "md",
+  value: controlledValue,
+  onChange,
 }: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [internalValue, setInternalValue] = useState<string | null>(null);
+
+  const isControlled = controlledValue !== undefined;
+  const selectedValue = isControlled ? controlledValue : internalValue;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +41,11 @@ const SelectInput = ({
   }, []);
 
   const handleSelect = (choice: string) => {
-    setSelectedValue(choice);
+    if (isControlled && onChange) {
+      onChange(choice);
+    } else {
+      setInternalValue(choice);
+    }
     setIsOpen(false);
   };
 

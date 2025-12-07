@@ -1,8 +1,9 @@
 import { cn } from "cn-utility";
 import TextInput from "../atoms/TextInput";
 import type { TextInputVariant } from "@/types/ComponentTypes";
+import type { InputHTMLAttributes } from "react";
 
-interface InputCompleteProps {
+interface InputCompleteProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label: string;
   placeholder?: string;
@@ -20,6 +21,7 @@ const InputComplete = ({
   className,
   labelClassName,
   inputClassName,
+  ...props
 }: InputCompleteProps) => {
   return (
     <div
@@ -40,6 +42,7 @@ const InputComplete = ({
         placeholder={placeholder}
         className={cn(inputClassName)}
         variant={variant}
+        {...props}
       />
     </div>
   );
