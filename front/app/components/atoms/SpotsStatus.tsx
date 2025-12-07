@@ -13,6 +13,7 @@ const SpotsStatus = ({ capacity, className }: SpotsStatusProps) => {
 
   return (
     <p
+      data-testid="spots-status"
       className={cn(
         "font-semibold text-xs",
         capacity > 0 ? "text-low-availability" : "text-no-availability",

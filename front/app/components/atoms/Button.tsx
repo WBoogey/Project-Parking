@@ -23,12 +23,12 @@ const Button = ({
       className={cn(
         "cursor-pointer whitespace-nowrap",
         {
-          "rounded-2xl px-9 py-3 flex items-center justify-center gap-2.5 transition-colors text-primary bg-accent hover:bg-accent/80":
+          "rounded-2xl py-3 flex items-center justify-center gap-2.5 transition-colors text-primary bg-accent hover:bg-accent/80":
             variant === "default",
           "text-secondary hover:underline": variant === "plain",
         },
         variant === "default" && {
-          "w-32.5": size === "sm",
+          "w-36": size === "sm",
           "w-96": size === "md",
           "w-120": size === "lg",
           "w-full": size === "full",
