@@ -10,6 +10,7 @@ interface SelectInputProps {
   variant?: SelectVariantType;
   value?: string;
   onChange?: (value: string) => void;
+  disabled?: boolean;
 }
 
 const SelectInput = ({
@@ -18,11 +19,12 @@ const SelectInput = ({
   variant = "md",
   value: controlledValue,
   onChange,
+  disabled,
 }: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [internalValue, setInternalValue] = useState<string | null>(null);
 
-  const isControlled = controlledValue !== undefined;
+  const isControlled = onChange !== undefined;
   const selectedValue = isControlled ? controlledValue : internalValue;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -60,9 +62,10 @@ const SelectInput = ({
       })}
     >
       <SelectInputTrigger
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         text={selectedValue || placeholder}
         isOpen={isOpen}
+        disabled={disabled}
       />
 
       <div
@@ -73,7 +76,7 @@ const SelectInput = ({
             "right-0": ["lg", "full"].includes(variant),
           },
           isOpen
-            ? "max-h-96 opacity-100 top-full"
+            ? "max-h-96 opacity-100 top-full z-100"
             : "max-h-0 opacity-0 pointer-events-none top-1/2",
         )}
       >
@@ -92,4 +95,3 @@ const SelectInput = ({
 };
 
 export default SelectInput;
-

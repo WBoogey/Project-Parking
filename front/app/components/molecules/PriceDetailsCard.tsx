@@ -10,6 +10,8 @@ interface PriceDetailsCardProps {
   price: number;
   frequency?: FrequencyType;
   className?: string;
+  onClick?: () => void;
+  isSelected?: boolean;
 }
 
 const PriceDetailsCard = ({
@@ -18,13 +20,21 @@ const PriceDetailsCard = ({
   price,
   frequency,
   className,
+  onClick,
+  isSelected,
 }: PriceDetailsCardProps) => {
   const Icon = variant === "car" ? PopiconsCarLine : PopiconsScooterLine;
 
+  const Component = onClick ? "button" : "div";
+
   return (
-    <div
+    <Component
+      onClick={onClick}
+      type={onClick ? "button" : undefined}
       className={cn(
-        "w-93 flex items-center justify-between px-3 py-2 border rounded-xl",
+        "w-full flex items-center justify-between px-3 py-2 rounded-xl",
+        onClick && "cursor-pointer border",
+        isSelected ? "border-accent" : "border-tertiary",
         className,
       )}
     >
@@ -40,7 +50,7 @@ const PriceDetailsCard = ({
         </div>
       </div>
       <PriceIndicator price={price} frequency={frequency} />
-    </div>
+    </Component>
   );
 };
 

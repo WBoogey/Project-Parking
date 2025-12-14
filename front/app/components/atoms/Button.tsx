@@ -8,6 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   onClick: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 const Button = ({
@@ -16,16 +17,20 @@ const Button = ({
   variant = "default",
   onClick,
   className,
+  disabled,
   ...props
 }: ButtonProps) => {
   return (
     <button
       className={cn(
-        "cursor-pointer whitespace-nowrap",
+        "whitespace-nowrap",
+        disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
         {
-          "rounded-2xl py-3 flex items-center justify-center gap-2.5 transition-colors text-primary bg-accent hover:bg-accent/80":
+          "rounded-2xl py-3 flex items-center justify-center gap-2.5 transition-colors text-primary bg-accent":
             variant === "default",
-          "text-secondary hover:underline": variant === "plain",
+          "hover:bg-accent/80": variant === "default" && !disabled,
+          "text-secondary hover:underline": variant === "plain" && !disabled,
+          "text-secondary": variant === "plain" && disabled,
         },
         variant === "default" && {
           "w-36": size === "sm",
@@ -36,6 +41,7 @@ const Button = ({
         className,
       )}
       onClick={onClick}
+      disabled={disabled}
       {...props}
     >
       {children}
