@@ -6,7 +6,8 @@ interface ParkingCardProps {
   name: string;
   totalSpots: number;
   availableSpots?: number;
-  onEdit: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ const ParkingCard = ({
   totalSpots,
   availableSpots,
   onEdit,
+  onDelete,
   className,
 }: ParkingCardProps) => {
   return (
@@ -36,9 +38,23 @@ const ParkingCard = ({
           )}
         </div>
       </div>
-      <Button onClick={onEdit} size="sm">
-        Editer
-      </Button>
+      <div className="flex gap-2">
+        {onEdit && (
+          <Button onClick={onEdit} size="sm">
+            Editer
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            onClick={onDelete}
+            size="sm"
+            variant="outline"
+            className="text-red-500 border-red-500 hover:bg-red-50"
+          >
+            Supprimer
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

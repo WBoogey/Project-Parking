@@ -5,6 +5,9 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 
 export default [
+  {
+    ignores: ["build/**", "dist/**", ".react-router/**", "node_modules/**"],
+  },
   js.configs.recommended,
   {
     files: ["**/*.{js,mjs,cjs,jsx}"],
@@ -28,6 +31,12 @@ export default [
       "@typescript-eslint/no-unused-vars": "warn",
     },
   },
+  {
+    files: ["vite.config.ts"],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   pluginReact.configs.flat.recommended,
   {
     settings: {
@@ -41,4 +50,3 @@ export default [
     },
   },
 ];
-

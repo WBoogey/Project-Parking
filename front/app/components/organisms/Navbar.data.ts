@@ -9,10 +9,9 @@ export const searchDropdownData: NavbarDropdownData = {
   title: "Vous cherchez une place",
   elements: [
     [
-      { title: "primary text", href: "#" },
-      { title: "primary text", href: "#" },
+      { title: "Trouver un parking", href: "/search" },
+      { title: "Comment ça marche", href: "/#how-it-works" },
     ],
-    [{ title: "primary text", href: "#" }],
   ],
 };
 
@@ -20,9 +19,8 @@ export const ownerDropdownData: NavbarDropdownData = {
   title: "Vous êtes propriétaire",
   elements: [
     [
-      { title: "primary text", href: "#" },
-      { title: "primary text", href: "#" },
+      { title: "Tableau de bord", href: "/owner" },
+      { title: "Ajouter un parking", href: "/owner/parkings/add" },
     ],
-    [{ title: "primary text", href: "#" }],
   ],
 };

@@ -1,6 +1,6 @@
 export type ButtonSize = "sm" | "md" | "lg" | "full";
 
-export type ButtonVariant = "default" | "plain";
+export type ButtonVariant = "default" | "plain" | "outline";
 
 export type TextInputVariant = "md" | "full";
 

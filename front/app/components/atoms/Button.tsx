@@ -23,16 +23,26 @@ const Button = ({
   return (
     <button
       className={cn(
-        "whitespace-nowrap",
+        "whitespace-nowrap transition-colors",
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
         {
-          "rounded-2xl py-3 flex items-center justify-center gap-2.5 transition-colors text-primary bg-accent":
+          // Default Variant (Filled)
+          "rounded-2xl py-3 flex items-center justify-center gap-2.5 text-primary bg-accent":
             variant === "default",
           "hover:bg-accent/80": variant === "default" && !disabled,
+
+          // Plain Variant (Text only)
           "text-secondary hover:underline": variant === "plain" && !disabled,
           "text-secondary": variant === "plain" && disabled,
+
+          // Outline Variant
+          "rounded-2xl py-3 flex items-center justify-center gap-2.5 bg-transparent border border-current":
+            variant === "outline",
+          "text-secondary border-secondary hover:bg-secondary/5":
+            variant === "outline" && !disabled,
         },
-        variant === "default" && {
+        // Apply sizing to default and outline variants
+        (variant === "default" || variant === "outline") && {
           "w-36": size === "sm",
           "w-96": size === "md",
           "w-120": size === "lg",
