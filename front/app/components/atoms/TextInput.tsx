@@ -20,7 +20,7 @@ const TextInput = ({
       type={type}
       id={id}
       className={cn(
-        "text-secondary border-2 border-tertiary focus:outline-secondary rounded-xl p-2.5 placeholder:text-tertiary",
+        "text-secondary border border-tertiary focus:outline-secondary rounded-xl p-2.5 placeholder:text-tertiary",
         {
           "w-64": variant === "md",
           "w-full": variant === "full",
