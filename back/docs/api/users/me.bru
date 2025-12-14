@@ -1,0 +1,33 @@
+meta {
+  name: Get Current User
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/users/me
+  body: none
+  auth: none
+}
+
+script:post-response{
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 when authenticated", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should return user data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("email");
+    expect(res.body.data).to.have.property("firstName");
+    expect(res.body.data).to.have.property("lastName");
+    expect(res.body.data).to.have.property("role");
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+}

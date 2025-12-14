@@ -1,6 +1,13 @@
 <?php
 
-use Core\Router;
+use App\Infrastructure\Core\Config\Router;
+use App\Infrastructure\Core\Config\Config;
+use App\Infrastructure\Core\Config\Database;
+use App\Infrastructure\Middleware\MiddlewareHandler;
+use App\Infrastructure\Repository\UserRepositorySQL;
+use App\Infrastructure\Repository\OwnerRepositorySQL;
+use App\Infrastructure\Repository\CustomerRepositorySQL;
+use App\Infrastructure\adaptaters\FirebaseJwtService;
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
@@ -13,7 +20,7 @@ function cors()
   header(
     "Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With",
   );
-  header("Access-Control-Max-Age: 3600"); // Cache
+  header("Access-Control-Max-Age: 3600");
 
   if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
@@ -25,20 +32,51 @@ cors();
 set_exception_handler(function ($e) {
   http_response_code(500);
   echo json_encode([
-    "status" => "error",
-    "message" => "Internal Server Error",
-    "details" => $e->getMessage(), // A Enlever en prod
+    "type" => "https://httpstatuses.com/500",
+    "title" => "Internal Server Error",
+    "detail" => $e->getMessage(),
+    "status" => 500,
   ]);
 });
+
+// Configuration et dépendances globales
+$config = Config::getInstance();
+$pdo = Database::getInstance()->getConnection();
+
+// Repositories
+$userRepository = new UserRepositorySQL($pdo);
+$ownerRepository = new OwnerRepositorySQL($pdo);
+$customerRepository = new CustomerRepositorySQL($pdo);
+
+// Services
+$jwtService = new FirebaseJwtService(
+  secret: $config->get("jwt.secret_key"),
+  expirationSeconds: $config->get("jwt.expiration"),
+);
+
+// Middleware handler
+$middlewareHandler = new MiddlewareHandler($jwtService, $userRepository);
 
 // Initialisation du router
 $url = $_SERVER["REQUEST_URI"];
 $router = new Router($url);
+$router->setMiddlewareHandler($middlewareHandler);
 
-// Chargement de tous les fichiers de routes
-require_once __DIR__ . "/../routes/user.php";
-require_once __DIR__ . "/../routes/app.php";
+// Chargement des routes
+require_once __DIR__ . "/../src/routes/user.php";
+require_once __DIR__ . "/../src/routes/owner.php";
+require_once __DIR__ . "/../src/routes/customer.php";
+require_once __DIR__ . "/../src/routes/app.php";
 
 // Exécution du router
-$router->run();
-var_dump($router->run());
+try {
+  echo $router->run();
+} catch (Exception $e) {
+  http_response_code(404);
+  echo json_encode([
+    "type" => "https://httpstatuses.com/404",
+    "title" => "Not Found",
+    "detail" => "Route not found",
+    "status" => 404,
+  ]);
+}

@@ -1,29 +1,22 @@
 <?php
 
+
+
 namespace App\Domain\Customer;
 
-use App\Domain\Customer\Customer;
+use App\Domain\User\UserId;
+use App\Domain\Reservation\Reservation;
+use App\Domain\Subscription\Subscription;
+use App\Domain\Stationing\Stationing;
 
 interface CustomerRepositoryInterface
 {
-    public function save(Customer $customer): void;
+  /** @return Reservation[] */
+  public function getReservations(UserId $customerId): array;
 
-    /**
-     * Récupérer un client par son ID, email, prénom ou nom
-     */
-    public function findById(int $id): ?Customer;
-    public function findByEmail(string $email): ?Customer;
-    public function findByFullName(string $firstName, string $lastName): ?Customer;
+  /** @return Subscription[] */
+  public function getSubscriptions(UserId $customerId): array;
 
-    /**
-     * Supprimer un client du domaine
-     */
-    public function delete(Customer $customer): void;
-
-    /**
-     * Liste des réservations, abonnements ou stationnements d'un client
-     */
-    public function getReservations(Customer $customer): array;
-    public function getSubscriptions(Customer $customer): array;
-    public function getStationings(Customer $customer): array;
+  /** @return Stationing[] */
+  public function getStationings(UserId $customerId): array;
 }

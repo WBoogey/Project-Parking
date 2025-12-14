@@ -2,68 +2,79 @@
 
 namespace App\Domain\Stationing;
 
-use App\Domain\Customer\Customer;
-use App\Domain\Parking\Parking;
-use App\Domain\Stationing\StationingStatus;
+use App\Domain\Parking\ParkingId;
+use App\Domain\User\UserId;
+use App\Infrastructure\Core\Domain\Entity;
+use DateTime;
 
-
-class Stationing
+/**
+ * @extends Entity<array{id: StationingId, startTime: DateTime, endTime: DateTime, status: StationingStatus, userId: UserId, parkingId: ParkingId}>
+ */
+class Stationing extends Entity
 {
-    private int $id;
+  private function __construct(
+    StationingId $id,
+    DateTime $startTime,
+    DateTime $endTime,
+    StationingStatus $status,
+    UserId $userId,
+    ParkingId $parkingId,
+  ) {
+    parent::__construct([
+      "id" => $id,
+      "startTime" => $startTime,
+      "endTime" => $endTime,
+      "status" => $status,
+      "userId" => $userId,
+      "parkingId" => $parkingId,
+    ]);
+  }
 
-    private \DateTime $startTime;
+  public static function create(
+    DateTime $startTime,
+    DateTime $endTime,
+    StationingStatus $status,
+    UserId $userId,
+    ParkingId $parkingId,
+    ?StationingId $id = null,
+  ): self {
+    return new self(
+      id: $id ?? StationingId::generate(),
+      startTime: $startTime,
+      endTime: $endTime,
+      status: $status,
+      userId: $userId,
+      parkingId: $parkingId,
+    );
+  }
 
-    private \DateTime $endTime;
+  public function getId(): StationingId
+  {
+    return $this->props["id"];
+  }
 
-    private StationingStatus $status;
+  public function getStartTime(): DateTime
+  {
+    return $this->props["startTime"];
+  }
 
-    private Customer $customer;
+  public function getEndTime(): DateTime
+  {
+    return $this->props["endTime"];
+  }
 
-    private Parking $parking;
+  public function getStatus(): StationingStatus
+  {
+    return $this->props["status"];
+  }
 
-    public function __construct(
-        int $id,
-        \DateTime $startTime,
-        \DateTime $endTime,
-        StationingStatus $status,
-        Customer $customer,
-        Parking $parking
-    ) {
-        $this->id = $id;
-        $this->startTime = $startTime;
-        $this->endTime = $endTime;
-        $this->status = $status;
-        $this->customer = $customer;
-        $this->parking = $parking;
-    }
+  public function getUserId(): UserId
+  {
+    return $this->props["userId"];
+  }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getStartTime(): \DateTime
-    {
-        return $this->startTime;
-    }
-
-    public function getEndTime(): \DateTime
-    {
-        return $this->endTime;
-    }
-
-    public function getStatus(): StationingStatus
-    {
-        return $this->status;
-    }
-
-    public function getCustomer(): Customer
-    {
-        return $this->customer;
-    }
-
-    public function getParking(): Parking
-    {
-        return $this->parking;
-    }
+  public function getParkingId(): ParkingId
+  {
+    return $this->props["parkingId"];
+  }
 }

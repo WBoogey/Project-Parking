@@ -2,25 +2,18 @@
 
 namespace App\Domain\Rate;
 
-use App\Domain\Rate\Rate;
-use App\Domain\Rate\RateType;
-
 interface RateRepositoryInterface
 {
-    /**
-     * Sauvegarder un tarif (création ou mise à jour)
-     */
-    public function save(Rate $rate): void;
+  public function save(Rate $rate): void;
 
-    /**
-     * Récupérer un tarif par son ID, prix, type
-     */
-    public function findById(int $id): ?Rate;
-    public function findByPrice(float $price): ?Rate;
-    public function findByType(RateType $type): array;
+  public function findById(RateId $id): ?Rate;
 
-    /**
-     * Supprimer un tarif
-     */
-    public function delete(Rate $rate): void;
+  public function findByPrice(float $price): ?Rate;
+
+  /**
+   * @return Rate[]
+   */
+  public function findByType(RateType $type): array;
+
+  public function delete(Rate $rate): void;
 }

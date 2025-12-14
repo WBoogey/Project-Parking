@@ -2,77 +2,90 @@
 
 namespace App\Domain\Subscription;
 
+use App\Domain\Parking\ParkingId;
+use App\Domain\User\UserId;
+use App\Infrastructure\Core\Domain\Entity;
 
-use App\Domain\Customer\Customer;
-use App\Domain\Parking\Parking;
-
-
-class Subscription
+/**
+ * @extends Entity<array{id: SubscriptionId, userId: UserId, parkingId: ParkingId, startDate: string, endDate: string, rate: float, weeklySlots: array}>
+ */
+class Subscription extends Entity
 {
-    private int $id;
+  private function __construct(
+    SubscriptionId $id,
+    UserId $userId,
+    ParkingId $parkingId,
+    string $startDate,
+    string $endDate,
+    float $rate,
+    array $weeklySlots,
+  ) {
+    parent::__construct([
+      "id" => $id,
+      "userId" => $userId,
+      "parkingId" => $parkingId,
+      "startDate" => $startDate,
+      "endDate" => $endDate,
+      "rate" => $rate,
+      "weeklySlots" => $weeklySlots,
+    ]);
+  }
 
-    private Customer $customer;
+  public static function create(
+    UserId $userId,
+    ParkingId $parkingId,
+    string $startDate,
+    string $endDate,
+    float $rate,
+    array $weeklySlots = [],
+    ?SubscriptionId $id = null,
+  ): self {
+    return new self(
+      id: $id ?? SubscriptionId::generate(),
+      userId: $userId,
+      parkingId: $parkingId,
+      startDate: $startDate,
+      endDate: $endDate,
+      rate: $rate,
+      weeklySlots: $weeklySlots,
+    );
+  }
 
-    private Parking $parking;
+  public function getId(): SubscriptionId
+  {
+    return $this->props["id"];
+  }
 
-    private string $startDate;
+  public function getUserId(): UserId
+  {
+    return $this->props["userId"];
+  }
 
-    private string $endDate;
+  public function getParkingId(): ParkingId
+  {
+    return $this->props["parkingId"];
+  }
 
-    private float $rate;
+  public function getStartDate(): string
+  {
+    return $this->props["startDate"];
+  }
 
-    private array $weeklySlots;
+  public function getEndDate(): string
+  {
+    return $this->props["endDate"];
+  }
 
-    public function __construct(
-        int $id,
-        Customer $customer,
-        Parking $parking,
-        string $startDate,
-        string $endDate,
-        float $rate,
-        array $weeklySlots
-    ) {
-        $this->id = $id;
-        $this->customer = $customer;
-        $this->parking = $parking;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->rate = $rate;
-        $this->weeklySlots = $weeklySlots;
-    }
+  public function getRate(): float
+  {
+    return $this->props["rate"];
+  }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getCustomer(): Customer
-    {
-        return $this->customer;
-    }
-
-    public function getParking(): Parking
-    {
-        return $this->parking;
-    }
-
-    public function getStartDate(): string
-    {
-        return $this->startDate;
-    }
-
-    public function getEndDate(): string
-    {
-        return $this->endDate;
-    }
-
-    public function getRate(): float
-    {
-        return $this->rate;
-    }
-
-    public function getWeeklySlots(): array
-    {
-        return $this->weeklySlots;
-    }
+  /**
+   * @return array
+   */
+  public function getWeeklySlots(): array
+  {
+    return $this->props["weeklySlots"];
+  }
 }
