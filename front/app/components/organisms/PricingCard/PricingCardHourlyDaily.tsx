@@ -64,7 +64,7 @@ const PricingCardHourlyDaily = ({
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" data-testid="start-reservation">
         <p className="text-secondary font-medium">
           Début de réservation <span className="text-accent">*</span>
         </p>
@@ -87,7 +87,7 @@ const PricingCardHourlyDaily = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" data-testid="end-reservation">
         <p className="text-secondary font-medium">
           Fin de réservation <span className="text-accent">*</span>
         </p>
