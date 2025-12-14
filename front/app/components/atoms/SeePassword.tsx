@@ -22,7 +22,7 @@ const SeePassword = ({
   return (
     <button
       onClick={() => setVisible(!visible)}
-      className={cn("px-3 py-2", className)}
+      className={cn("px-3 py-2 cursor-pointer", className)}
       aria-label={label}
       {...props}
     >

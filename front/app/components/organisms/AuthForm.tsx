@@ -2,7 +2,6 @@ import { useState } from "react";
 import { cn } from "cn-utility";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
-import SeePassword from "@/components/atoms/SeePassword";
 import type { AuthFormData, AuthFormMode } from "@/types/AuthFormTypes";
 
 interface AuthFormProps {
@@ -37,7 +36,6 @@ const AuthForm = ({
   const [companyName, setCompanyName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const isSignup = mode === "signup";
   const isLogin = mode === "login";
@@ -162,7 +160,7 @@ const AuthForm = ({
 
         <InputComplete
           id="email"
-          label={isSignupPro ? "Email*" : "Email"}
+          label="Email*"
           placeholder="nom.prenom@email.com"
           type="email"
           variant="full"
@@ -170,25 +168,14 @@ const AuthForm = ({
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="password"
-            className="font-semibold text-sm font-inter"
-          >
-            {isSignupPro ? "Mot de passe*" : "Mot de passe"}
-          </label>
-          <div className="flex items-center border border-tertiary rounded-xl overflow-hidden">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Votre mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="flex-1 px-4 py-2.5 outline-none text-secondary"
-            />
-            <SeePassword visible={showPassword} setVisible={setShowPassword} />
-          </div>
-        </div>
+        <InputComplete
+          id="password"
+          label="Mot de passe*"
+          placeholder="Votre mot de passe"
+          variant="full"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
         {showCompanyFields && (
           <>
