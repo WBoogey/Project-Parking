@@ -1,9 +1,9 @@
-interface PricingCardItemProps {
+interface PricingDetailsItemProps {
   label: string;
   price: number;
 }
 
-const PricingCardItem = ({ label, price }: PricingCardItemProps) => {
+const PricingDetailsItem = ({ label, price }: PricingDetailsItemProps) => {
   const formattedPrice = new Intl.NumberFormat("fr-FR", {
     style: "currency",
     currency: "EUR",
@@ -17,5 +17,4 @@ const PricingCardItem = ({ label, price }: PricingCardItemProps) => {
   );
 };
 
-export default PricingCardItem;
-
+export default PricingDetailsItem;

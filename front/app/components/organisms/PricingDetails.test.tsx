@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import PricingCard from "./PricingCard";
+import PricingDetails from "./PricingDetails";
 import userEvent from "@testing-library/user-event";
 
 const mockProps = {
   onClick: vi.fn(),
 };
 
-describe("PricingCard", () => {
+describe("PricingDetails", () => {
   it.each([
     { variant: "hourly" as const, expectedText: "À l'heure" },
     { variant: "monthly" as const, expectedText: "Au mois" },
@@ -15,7 +15,7 @@ describe("PricingCard", () => {
     "should display $expectedText for $variant variant",
     ({ variant, expectedText }) => {
       // Arrange
-      render(<PricingCard {...mockProps} variant={variant} />);
+      render(<PricingDetails {...mockProps} variant={variant} />);
 
       // Assert
       expect(screen.getByText(expectedText)).toBeInTheDocument();
@@ -29,7 +29,7 @@ describe("PricingCard", () => {
     "should display price correctly when price is $price",
     ({ price, shouldDisplay }) => {
       // Arrange
-      render(<PricingCard {...mockProps} price={price} />);
+      render(<PricingDetails {...mockProps} price={price} />);
 
       // Assert
       if (shouldDisplay) {
@@ -55,7 +55,7 @@ describe("PricingCard", () => {
     "should render items list correctly when items is $description",
     ({ items, shouldRenderList }) => {
       // Arrange
-      render(<PricingCard {...mockProps} items={items} />);
+      render(<PricingDetails {...mockProps} items={items} />);
 
       // Assert
       if (shouldRenderList) {
@@ -72,7 +72,7 @@ describe("PricingCard", () => {
   it("should call onClick when card is clicked", async () => {
     // Arrange
     const handleClick = vi.fn();
-    render(<PricingCard {...mockProps} onClick={handleClick} />);
+    render(<PricingDetails {...mockProps} onClick={handleClick} />);
     const user = userEvent.setup();
 
     // Act

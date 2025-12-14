@@ -4,24 +4,24 @@ import {
   PopiconsClockLine,
 } from "@popicons/react";
 import { cn } from "cn-utility";
-import type { PricingCardItemData } from "@/types/ParkingTypes";
-import PricingCardItem from "./PricingCardItem";
+import type { PricingDetailsItemData } from "@/types/ParkingTypes";
+import PricingDetailsItem from "./PricingDetailsItem";
 
-interface PricingCardProps {
+interface PricingDetailsProps {
   variant?: "monthly" | "hourly";
   price?: number;
-  items?: PricingCardItemData[];
+  items?: PricingDetailsItemData[];
   className?: string;
   onClick: () => void;
 }
 
-const PricingCard = ({
+const PricingDetails = ({
   variant = "hourly",
   price,
   items,
   className,
   onClick,
-}: PricingCardProps) => {
+}: PricingDetailsProps) => {
   const config = {
     Icon: variant === "hourly" ? PopiconsClockLine : PopiconsCalendarLine,
     text: variant === "hourly" ? "À l'heure" : "Au mois",
@@ -51,7 +51,7 @@ const PricingCard = ({
       {items && items.length > 0 && (
         <ul className="flex flex-col border-t border-tertiary pt-3">
           {items.map((item) => (
-            <PricingCardItem
+            <PricingDetailsItem
               key={item.label}
               label={item.label}
               price={item.price}
@@ -63,5 +63,4 @@ const PricingCard = ({
   );
 };
 
-export default PricingCard;
-
+export default PricingDetails;
