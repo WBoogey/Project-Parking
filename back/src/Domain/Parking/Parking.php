@@ -2,8 +2,8 @@
 
 namespace App\Domain\Parking;
 
-use App\Domain\User\UserId;
-use App\Infrastructure\Core\Domain\Entity;
+use App\Domain\Owner\Owner;
+use App\Domain\Schedule\Schedule;
 
 /**
  * @extends Entity<array{id: ParkingId, location: string, capacity: int, ownerId: UserId}>
@@ -53,8 +53,38 @@ class Parking extends Entity
     return $this->props["capacity"];
   }
 
-  public function getOwnerId(): UserId
-  {
-    return $this->props["ownerId"];
-  }
+    private array $schedules;
+
+    public function __construct(int $id, string $location, int $capacity, Owner $owner, array $schedules = [])
+    {
+        $this->id = $id;
+        $this->location = $location;
+        $this->capacity = $capacity;
+        $this->owner = $owner;
+        $this->schedules = $schedules;
+    }
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getLocation(): string
+    {
+        return $this->location;
+    }
+
+    public function getCapacity(): int
+    {
+        return $this->capacity;
+    }
+
+    public function getOwner(): Owner
+    {
+        return $this->owner;
+    }
+
+    public function getSchedules(): array
+    {
+        return $this->schedules;
+    }
 }
