@@ -1,47 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import apiClient from "@/api/client";
 import Navbar from "@/components/organisms/Navbar";
-
-interface Reservation {
-  id: string;
-  dayOfWeek: string;
-  startHour: string;
-  endHour: string;
-  parkingId: string;
-}
-
-interface Subscription {
-  id: string;
-  startDate: string;
-  endDate: string;
-  rate: {
-    id: string;
-    name: string;
-    amount: number;
-  };
-  parkingId: string;
-}
+import {
+  useCustomerReservations,
+  useCustomerSubscriptions,
+} from "@/hooks/useCustomer";
 
 export default function CustomerDashboard() {
-  const { data: reservations, isLoading: isLoadingRes } = useQuery({
-    queryKey: ["customer", "reservations"],
-    queryFn: async () => {
-      const response = await apiClient.get<{ data: Reservation[] }>(
-        "/customer/reservations",
-      );
-      return response.data.data;
-    },
-  });
-
-  const { data: subscriptions, isLoading: isLoadingSub } = useQuery({
-    queryKey: ["customer", "subscriptions"],
-    queryFn: async () => {
-      const response = await apiClient.get<{ data: Subscription[] }>(
-        "/customer/subscriptions",
-      );
-      return response.data.data;
-    },
-  });
+  const { data: reservations, isLoading: isLoadingRes } =
+    useCustomerReservations();
+  const { data: subscriptions, isLoading: isLoadingSub } =
+    useCustomerSubscriptions();
 
   const isLoading = isLoadingRes || isLoadingSub;
 

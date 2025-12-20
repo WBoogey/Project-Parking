@@ -14,6 +14,8 @@ interface AuthFormProps {
   onNavigateToLogin?: () => void;
   onNavigateToSignup?: () => void;
   onBackToSite?: () => void;
+  isLoading?: boolean;
+  error?: string;
   className?: string;
 }
 
@@ -27,6 +29,8 @@ const AuthForm = ({
   onNavigateToLogin,
   onNavigateToSignup,
   onBackToSite,
+  isLoading = false,
+  error,
   className,
 }: AuthFormProps) => {
   const [firstName, setFirstName] = useState("");
@@ -213,6 +217,10 @@ const AuthForm = ({
       </div>
 
       <div className="flex flex-col items-center gap-2">
+        {error && (
+          <p className="text-red-500 text-sm font-medium mb-2">{error}</p>
+        )}
+
         {isSignup && (
           <button
             type="button"
@@ -260,8 +268,12 @@ const AuthForm = ({
         )}
       </div>
 
-      <Button onClick={handleSubmit} size="full" disabled={!isFormValid()}>
-        {getSubmitLabel()}
+      <Button
+        onClick={handleSubmit}
+        size="full"
+        disabled={!isFormValid() || isLoading}
+      >
+        {isLoading ? "Chargement..." : getSubmitLabel()}
       </Button>
 
       {onBackToSite && (

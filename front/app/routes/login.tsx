@@ -1,35 +1,20 @@
 import { useNavigate } from "react-router";
-import { useMutation } from "@tanstack/react-query";
 import AuthForm from "@/components/organisms/AuthForm";
-import apiClient from "@/api/client";
-import type { AuthFormData } from "@/types/AuthFormTypes";
+import { useLogin } from "@/hooks/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
-
-  const mutation = useMutation({
-    mutationFn: async (data: AuthFormData) => {
-      const response = await apiClient.post("/auth/signin", {
-        email: data.email,
-        password: data.password,
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      navigate("/");
-    },
-    onError: (error) => {
-      console.error("Login failed:", error);
-    },
-  });
+  const { mutate, isPending, error } = useLogin();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <AuthForm
         mode="login"
-        onSubmit={(data) => mutation.mutate(data)}
+        onSubmit={(data) => mutate(data)}
         onNavigateToSignup={() => navigate("/register")}
         onBackToSite={() => navigate("/")}
+        isLoading={isPending}
+        error={error ? (error as Error).message : undefined}
       />
     </div>
   );
