@@ -1,48 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
 import ParkingCard from "@/components/organisms/ParkingCard";
 import Button from "@/components/atoms/Button";
-import apiClient from "@/api/client";
-
-interface Parking {
-  id: string;
-  location: string;
-  capacity: number;
-  ownerId: string;
-}
+import { useDeleteParking, useOwnerParkings } from "@/hooks/useOwner";
 
 export default function OwnerDashboard() {
-  const queryClient = useQueryClient();
-
-  const {
-    data: parkings,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["owner", "parkings"],
-    queryFn: async () => {
-      const response = await apiClient.get<{ data: Parking[] }>(
-        "/owner/parkings",
-      );
-      return response.data.data;
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (parkingId: string) => {
-      const response = await apiClient.delete("/owner/parkings", {
-        data: { parkingId },
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["owner", "parkings"] });
-    },
-    onError: (error) => {
-      console.error("Failed to delete parking:", error);
-      alert("Erreur lors de la suppression du parking");
-    },
-  });
+  const { data: parkings, isLoading, error } = useOwnerParkings();
+  const deleteMutation = useDeleteParking();
 
   const totalCapacity = parkings?.reduce((acc, p) => acc + p.capacity, 0) || 0;
   const totalParkings = parkings?.length || 0;

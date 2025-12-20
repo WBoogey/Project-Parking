@@ -8,4 +8,5 @@ export interface AuthFormData {
   companyName?: string;
   address?: string;
   city?: string;
+  role?: string;
 }

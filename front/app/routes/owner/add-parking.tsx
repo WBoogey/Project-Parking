@@ -1,34 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "@/api/client";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
+import { useAddParking } from "@/hooks/useOwner";
 import React from "react";
 
 export default function AddParking() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { mutate, isPending, isError } = useAddParking();
 
   const [location, setLocation] = useState("");
   const [capacity, setCapacity] = useState("");
-
-  const mutation = useMutation({
-    mutationFn: async (data: { location: string; capacity: number }) => {
-      const response = await apiClient.post("/owner/parkings", data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["owner", "parkings"] });
-      navigate("/owner");
-    },
-  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!location || !capacity) return;
 
-    mutation.mutate({
+    mutate({
       location,
       capacity: parseInt(capacity, 10),
     });
@@ -73,16 +61,12 @@ export default function AddParking() {
           >
             Annuler
           </Button>
-          <Button
-            onClick={() => {}}
-            type="submit"
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? "Ajout..." : "Ajouter le parking"}
+          <Button onClick={() => {}} type="submit" disabled={isPending}>
+            {isPending ? "Ajout..." : "Ajouter le parking"}
           </Button>
         </div>
 
-        {mutation.isError && (
+        {isError && (
           <p className="text-red-500 text-sm">
             Une erreur est survenue lors de l&apos;ajout.
           </p>

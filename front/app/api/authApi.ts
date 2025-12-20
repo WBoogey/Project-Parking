@@ -8,12 +8,7 @@ export const authApi = {
   },
 
   signup: async (data: AuthFormData) => {
-    const response = await apiClient.post("/auth/signup", {
-      email: data.email,
-      password: data.password,
-      firstName: data.firstName,
-      lastName: data.lastName,
-    });
+    const response = await apiClient.post("/auth/signup", data);
     return response.data;
   },
 

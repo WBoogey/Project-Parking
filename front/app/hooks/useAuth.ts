@@ -16,7 +16,7 @@ export const useLogin = () => {
   });
 };
 
-export const useRegister = () => {
+export const useRegister = (options?: { onSuccess?: () => void }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -24,7 +24,11 @@ export const useRegister = () => {
     mutationFn: authApi.signup,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
-      navigate("/");
+      if (options?.onSuccess) {
+        options.onSuccess();
+      } else {
+        navigate("/");
+      }
     },
   });
 };
