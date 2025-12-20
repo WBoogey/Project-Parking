@@ -1,17 +1,25 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
+import { useCreateReservation } from "@/hooks/useReservation";
 import React from "react";
 
 export default function Payment() {
   const navigate = useNavigate();
-  const [isSuccess, setIsSuccess] = useState(false);
+  const location = useLocation();
+  const parkingId = location.state?.parkingId || "mock-1";
+
+  const { mutate, isPending, isSuccess } = useCreateReservation();
 
   const handlePayment = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSuccess(true);
-    setTimeout(() => {}, 2000);
+
+    mutate({
+      parkingId,
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 86400000).toISOString(),
+      paymentMethod: "card",
+    });
   };
 
   if (isSuccess) {
@@ -26,7 +34,7 @@ export default function Payment() {
             Votre paiement a été accepté (simulé). Vous recevrez un email de
             confirmation.
           </p>
-          <Button onClick={() => navigate("/owner/dashboard")}>
+          <Button onClick={() => navigate("/customer")}>
             Voir mes réservations
           </Button>
         </div>
@@ -94,8 +102,13 @@ export default function Payment() {
             <span className="font-bold text-2xl text-secondary">15,00 €</span>
           </div>
 
-          <Button type="submit" size="full" onClick={() => {}}>
-            Payer 15,00 €
+          <Button
+            type="submit"
+            size="full"
+            onClick={() => {}}
+            disabled={isPending}
+          >
+            {isPending ? "Traitement..." : "Payer 15,00 €"}
           </Button>
         </div>
       </form>

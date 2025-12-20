@@ -7,6 +7,6 @@ export const useUser = () => {
     queryKey: queryKeys.auth.user(),
     queryFn: userApi.getMe,
     retry: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -1,22 +1,16 @@
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
+import { useParking } from "@/hooks/useParkings";
 
 export default function ParkingDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { data: parking, isLoading } = useParking(id);
 
-  const parking = {
-    id,
-    location: "12 Rue de la Paix, 75000 Paris",
-    description:
-      "Parking sécurisé en plein centre de Paris. Accès 24/7, vidéosurveillance.",
-    features: ["Sécurisé", "Couvert", "Accès handicapé", "Bornes électriques"],
-    pricing: {
-      hourly: 2.5,
-      daily: 15,
-      monthly: 150,
-    },
-  };
+  if (isLoading) return <div className="p-8 text-center">Chargement...</div>;
+
+  if (!parking)
+    return <div className="p-8 text-center">Parking non trouvé.</div>;
 
   return (
     <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -79,7 +73,12 @@ export default function ParkingDetails() {
             </div>
           </div>
 
-          <Button size="full" onClick={() => navigate("/payment")}>
+          <Button
+            size="full"
+            onClick={() =>
+              navigate("/payment", { state: { parkingId: parking.id } })
+            }
+          >
             Réserver maintenant
           </Button>
           <p className="text-center text-xs text-gray-400 mt-4">
