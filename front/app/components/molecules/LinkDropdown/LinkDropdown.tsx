@@ -1,6 +1,6 @@
 import { PopiconsChevronBottomLine } from "@popicons/react";
 import { cn } from "cn-utility";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import DropdownList from "./DropdownList";
 import type {
   DropdownFullListType,
@@ -55,10 +55,10 @@ const LinkDropdown = ({
         {dropdownElements.map((list: DropdownListType, index: number) => {
           const isLast = index === dropdownElements.length - 1;
           return (
-            <>
-              <DropdownList key={index} list={list} />
+            <Fragment key={index}>
+              <DropdownList list={list} />
               {!isLast && <span className="block bg-black/25 h-px w-full" />}
-            </>
+            </Fragment>
           );
         })}
       </div>
