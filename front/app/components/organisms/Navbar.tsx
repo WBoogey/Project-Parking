@@ -10,19 +10,47 @@ const Navbar = () => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
 
+  // Dynamic links logic
+  const homeLink = user
+    ? user.role === "owner"
+      ? "/owner"
+      : "/customer"
+    : "/";
+
+  const searchDropdownElements = [...searchDropdownData.elements];
+  if (user && user.role === "customer") {
+    // Add "Mes réservations" if connected as customer
+    // We create a new array to avoid mutating the original data reference
+    const firstGroup = [...searchDropdownElements[0]];
+    if (!firstGroup.find((el) => el.href === "/customer")) {
+      firstGroup.push({ title: "Mes réservations", href: "/customer" });
+    }
+    searchDropdownElements[0] = firstGroup;
+  }
+
+  const ownerDropdownElements =
+    user && user.role === "owner"
+      ? ownerDropdownData.elements
+      : [
+          [
+            { title: "Espace Propriétaire", href: "/register/pro" },
+            { title: "Devenir partenaire", href: "/register/pro" },
+          ],
+        ];
+
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-primary border-b border-tertiary w-full">
-      <Link to="/" className="text-xl font-semibold">
+      <Link to={homeLink} className="text-xl font-semibold">
         AppName
       </Link>
       <div className="flex items-center gap-8">
         <LinkDropdown
           title={searchDropdownData.title}
-          dropdownElements={searchDropdownData.elements}
+          dropdownElements={searchDropdownElements}
         />
         <LinkDropdown
           title={ownerDropdownData.title}
-          dropdownElements={ownerDropdownData.elements}
+          dropdownElements={ownerDropdownElements}
         />
       </div>
       <div className="flex items-center gap-4">
@@ -31,10 +59,10 @@ const Navbar = () => {
         ) : user ? (
           <>
             <Link
-              to="/customer"
+              to={user.role === "owner" ? "/owner" : "/customer"}
               className="text-secondary hover:underline font-medium"
             >
-              Mon Espace
+              {user.role === "owner" ? "Espace Pro" : "Mon Espace"}
             </Link>
             <Button
               onClick={() => logoutMutation.mutate()}

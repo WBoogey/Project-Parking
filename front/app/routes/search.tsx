@@ -44,19 +44,18 @@ export default function Search() {
           {parkings?.map((parking) => (
             <div
               key={parking.id}
-              className="relative group cursor-pointer"
+              className="cursor-pointer"
               onClick={() => navigate(`/parking/${parking.id}`)}
             >
               <ParkingCard
                 name={parking.location}
                 totalSpots={parking.capacity}
                 availableSpots={parking.available}
+                price={parking.priceDisplay}
                 onEdit={() => navigate(`/parking/${parking.id}`)}
+                editLabel="Voir"
                 className="hover:border-secondary transition-colors"
               />
-              <div className="absolute right-24 top-1/2 -translate-y-1/2 text-secondary font-bold">
-                {parking.priceDisplay}
-              </div>
             </div>
           ))}
           {parkings?.length === 0 && (

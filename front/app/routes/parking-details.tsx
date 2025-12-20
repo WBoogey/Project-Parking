@@ -1,11 +1,25 @@
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import { useParking } from "@/hooks/useParkings";
+import { useUser } from "@/hooks/useUser";
 
 export default function ParkingDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: parking, isLoading } = useParking(id);
+  const { data: user } = useUser();
+
+  const handleReservation = () => {
+    if (!user) {
+      // Redirect to login with return url
+      // We can't easily pass query params to the login page without modifying it
+      // So we'll just redirect to login for now, user will have to navigate back
+      // Ideally: navigate(`/login?redirect=/payment&parkingId=${parking?.id}`);
+      navigate("/login");
+      return;
+    }
+    navigate("/payment", { state: { parkingId: parking?.id } });
+  };
 
   if (isLoading) return <div className="p-8 text-center">Chargement...</div>;
 
@@ -73,12 +87,7 @@ export default function ParkingDetails() {
             </div>
           </div>
 
-          <Button
-            size="full"
-            onClick={() =>
-              navigate("/payment", { state: { parkingId: parking.id } })
-            }
-          >
+          <Button size="full" onClick={handleReservation}>
             Réserver maintenant
           </Button>
           <p className="text-center text-xs text-gray-400 mt-4">

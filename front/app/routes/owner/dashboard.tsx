@@ -68,7 +68,11 @@ export default function OwnerDashboard() {
               Vous n&apos;avez pas encore ajouté de parking.
             </p>
             <Link to="/owner/parkings/add">
-              <Button onClick={() => {}} variant="outline">
+              <Button
+                onClick={() => {}}
+                variant="outline"
+                className="w-auto px-8"
+              >
                 Ajouter mon premier parking
               </Button>
             </Link>

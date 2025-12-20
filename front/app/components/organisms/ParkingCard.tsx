@@ -6,18 +6,22 @@ interface ParkingCardProps {
   name: string;
   totalSpots: number;
   availableSpots?: number;
+  price?: string;
   onEdit?: () => void;
   onDelete?: () => void;
   className?: string;
+  editLabel?: string;
 }
 
 const ParkingCard = ({
   name,
   totalSpots,
   availableSpots,
+  price,
   onEdit,
   onDelete,
   className,
+  editLabel = "Editer",
 }: ParkingCardProps) => {
   return (
     <div
@@ -38,22 +42,29 @@ const ParkingCard = ({
           )}
         </div>
       </div>
-      <div className="flex gap-2">
-        {onEdit && (
-          <Button onClick={onEdit} size="sm">
-            Editer
-          </Button>
+      <div className="flex items-center gap-4">
+        {price && (
+          <span className="text-secondary font-bold whitespace-nowrap">
+            {price}
+          </span>
         )}
-        {onDelete && (
-          <Button
-            onClick={onDelete}
-            size="sm"
-            variant="outline"
-            className="text-red-500 border-red-500 hover:bg-red-50"
-          >
-            Supprimer
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {onEdit && (
+            <Button onClick={onEdit} size="sm">
+              {editLabel}
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              onClick={onDelete}
+              size="sm"
+              variant="outline"
+              className="text-red-500 border-red-500 hover:bg-red-50"
+            >
+              Supprimer
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
