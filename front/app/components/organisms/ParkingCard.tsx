@@ -71,3 +71,4 @@ const ParkingCard = ({
 };
 
 export default ParkingCard;
+

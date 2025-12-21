@@ -11,10 +11,6 @@ export default function ParkingDetails() {
 
   const handleReservation = () => {
     if (!user) {
-      // Redirect to login with return url
-      // We can't easily pass query params to the login page without modifying it
-      // So we'll just redirect to login for now, user will have to navigate back
-      // Ideally: navigate(`/login?redirect=/payment&parkingId=${parking?.id}`);
       navigate("/login");
       return;
     }
@@ -98,3 +94,4 @@ export default function ParkingDetails() {
     </div>
   );
 }
+

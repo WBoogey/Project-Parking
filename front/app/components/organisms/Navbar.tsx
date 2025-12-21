@@ -10,7 +10,6 @@ const Navbar = () => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
 
-  // Dynamic links logic
   const homeLink = user
     ? user.role === "owner"
       ? "/owner"
@@ -19,8 +18,6 @@ const Navbar = () => {
 
   const searchDropdownElements = [...searchDropdownData.elements];
   if (user && user.role === "customer") {
-    // Add "Mes réservations" if connected as customer
-    // We create a new array to avoid mutating the original data reference
     const firstGroup = [...searchDropdownElements[0]];
     if (!firstGroup.find((el) => el.href === "/customer")) {
       firstGroup.push({ title: "Mes réservations", href: "/customer" });
@@ -89,3 +86,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
