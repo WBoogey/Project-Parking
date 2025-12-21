@@ -4,9 +4,11 @@ import Button from "@/components/atoms/Button";
 import SubscriptionTypeSelector from "@/components/molecules/SubscriptionTypeSelector";
 import WeeklySlotPicker from "@/components/molecules/WeeklySlotPicker";
 import SelectInput from "@/components/molecules/SelectInput/SelectInput";
+import StripePayment from "@/components/organisms/StripePayment";
 import { useParking } from "@/hooks/useParkings";
 import { useUser } from "@/hooks/useUser";
-import { useSubscribe, useSubscriptionPrice } from "@/hooks/useSubscription";
+import { useSubscriptionPrice } from "@/hooks/useSubscription";
+import { useCreateCheckoutSession } from "@/hooks/useStripe";
 import type { SubscriptionType, WeeklySlot } from "@/types/SubscriptionTypes";
 import { getDefaultSlotsForType } from "@/api/subscriptionApi";
 
@@ -41,7 +43,7 @@ export default function SubscribePage() {
     subscriptionType === "custom" ? customSlots : undefined,
   );
 
-  const subscribeMutation = useSubscribe();
+  const checkoutMutation = useCreateCheckoutSession();
 
   const handleSubscribe = () => {
     if (!user) {
@@ -56,22 +58,13 @@ export default function SubscribePage() {
         ? customSlots
         : getDefaultSlotsForType(subscriptionType);
 
-    subscribeMutation.mutate(
-      {
-        parkingId: id,
-        data: {
-          subscriptionType,
-          startDate,
-          durationMonths,
-          weeklySlots: slots,
-        },
-      },
-      {
-        onSuccess: () => {
-          navigate("/customer");
-        },
-      },
-    );
+    checkoutMutation.mutate({
+      parkingId: id,
+      subscriptionType,
+      startDate,
+      durationMonths,
+      weeklySlots: slots,
+    });
   };
 
   const isFormValid = () => {
@@ -92,6 +85,14 @@ export default function SubscribePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-secondary">Parking non trouvé.</p>
+      </div>
+    );
+  }
+
+  if (checkoutMutation.isPending) {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <StripePayment isLoading={true} />
       </div>
     );
   }
@@ -189,21 +190,21 @@ export default function SubscribePage() {
           </div>
         </div>
 
+        {checkoutMutation.isError && (
+          <StripePayment
+            isLoading={false}
+            error={checkoutMutation.error}
+            onRetry={handleSubscribe}
+          />
+        )}
+
         <Button
           size="full"
           onClick={handleSubscribe}
-          disabled={!isFormValid() || subscribeMutation.isPending}
+          disabled={!isFormValid() || checkoutMutation.isPending}
         >
-          {subscribeMutation.isPending
-            ? "Traitement..."
-            : "Confirmer l'abonnement"}
+          Payer avec Stripe
         </Button>
-
-        {subscribeMutation.isError && (
-          <p className="text-red-500 text-center text-sm">
-            Une erreur est survenue. Veuillez réessayer.
-          </p>
-        )}
       </div>
     </div>
   );
