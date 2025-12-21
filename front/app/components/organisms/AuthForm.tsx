@@ -21,7 +21,7 @@ interface AuthFormProps {
 
 const AuthForm = ({
   mode,
-  appName = "App Name",
+  appName = "ParkShare",
   onSubmit,
   onGoogleAuth,
   onMicrosoftAuth,

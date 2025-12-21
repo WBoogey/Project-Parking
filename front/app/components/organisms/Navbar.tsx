@@ -38,7 +38,7 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-primary border-b border-tertiary w-full">
       <Link to={homeLink} className="text-xl font-semibold">
-        AppName
+        ParkShare
       </Link>
       <div className="flex items-center gap-8">
         <LinkDropdown
@@ -86,4 +86,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
