@@ -1,0 +1,71 @@
+meta {
+  name: 3. Create Rate
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/owner/parkings/{{parkingId}}/rates
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "type": "yearly_subscription",
+    "price": 899.99,
+    "calculationRule": "fixed",
+    "duration": "365 days"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+
+  // Store created rate ID for update/delete tests
+  if (res.body.data && res.body.data.id) {
+    bru.setEnvVar("newRateId", res.body.data.id);
+  }
+}
+
+tests {
+  test("should return 201 on successful creation", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should have correct message", function() {
+    expect(res.body.message).to.equal("Rate created successfully");
+  });
+
+  test("should return created rate data", function() {
+    expect(res.body.data).to.be.an("object");
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("parkingId");
+    expect(res.body.data).to.have.property("type");
+    expect(res.body.data).to.have.property("price");
+  });
+
+  test("should have correct type", function() {
+    expect(res.body.data.type).to.equal("yearly_subscription");
+  });
+
+  test("should have correct price", function() {
+    expect(res.body.data.price).to.equal(899.99);
+  });
+
+  test("should have correct duration", function() {
+    expect(res.body.data.duration).to.equal("365 days");
+  });
+
+  test("parkingId should match request", function() {
+    expect(res.body.data.parkingId).to.equal(bru.getEnvVar("parkingId"));
+  });
+}

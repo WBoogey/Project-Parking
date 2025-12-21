@@ -1,0 +1,64 @@
+meta {
+  name: 5. Update Rate
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/owner/parkings/{{parkingId}}/rates/{{newRateId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "price": 799.99,
+    "hourlyDiscount": 10,
+    "duration": "1 year"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 on successful update", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should have correct message", function() {
+    expect(res.body.message).to.equal("Rate updated successfully");
+  });
+
+  test("should return updated rate data", function() {
+    expect(res.body.data).to.be.an("object");
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("price");
+    expect(res.body.data).to.have.property("hourlyDiscount");
+  });
+
+  test("should have updated price", function() {
+    expect(res.body.data.price).to.equal(799.99);
+  });
+
+  test("should have updated hourlyDiscount", function() {
+    expect(res.body.data.hourlyDiscount).to.equal(10);
+  });
+
+  test("should have updated duration", function() {
+    expect(res.body.data.duration).to.equal("1 year");
+  });
+
+  test("type should remain unchanged", function() {
+    expect(res.body.data.type).to.equal("yearly_subscription");
+  });
+}
