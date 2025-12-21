@@ -75,7 +75,7 @@ export default function SubscribePage() {
 
   if (isParkingLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center">
         <p className="text-secondary">Chargement...</p>
       </div>
     );
@@ -83,7 +83,7 @@ export default function SubscribePage() {
 
   if (!parking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center">
         <p className="text-secondary">Parking non trouvé.</p>
       </div>
     );

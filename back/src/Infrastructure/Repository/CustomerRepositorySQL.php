@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\Domain\Customer\Customer;
 use App\Domain\Customer\CustomerRepositoryInterface;
 use App\Domain\User\UserId;
 use App\Domain\Parking\ParkingId;
@@ -20,7 +21,25 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
 {
   public function __construct(private readonly PDO $connection) {}
 
-  /** @return Reservation[] */
+  public function save(Customer $customer): void {}
+
+  public function findById(int $id): ?Customer
+  {
+    return null;
+  }
+
+  public function findByEmail(string $email): ?Customer
+  {
+    return null;
+  }
+
+  public function findByFullName(string $firstName, string $lastName): ?Customer
+  {
+    return null;
+  }
+
+  public function delete(Customer $customer): void {}
+
   public function getReservations(UserId $customerId): array
   {
     $sql = "SELECT id, day_of_week, start_hour, end_hour, user_id, parking_id
@@ -45,7 +64,6 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
     );
   }
 
-  /** @return Subscription[] */
   public function getSubscriptions(UserId $customerId): array
   {
     $sql = "SELECT id, start_date, end_date, rate_id, weekly_slots, user_id, parking_id
@@ -69,7 +87,6 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
     );
   }
 
-  /** @return Stationing[] */
   public function getStationings(UserId $customerId): array
   {
     $sql = "SELECT id, start_time, end_time, status, user_id, parking_id

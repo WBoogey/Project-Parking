@@ -2,20 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Infrastructure\Core\Config\Router;
-use App\Infrastructure\Core\Config\Config;
-use App\Infrastructure\Core\Config\Database;
-use App\Infrastructure\Middleware\MiddlewareHandler;
-use App\Infrastructure\Repository\UserRepositorySQL;
-use App\Infrastructure\Repository\OwnerRepositorySQL;
-use App\Infrastructure\Repository\CustomerRepositorySQL;
-use App\Infrastructure\Repository\SubscriptionRepositorySQL;
-use App\Infrastructure\Repository\RateRepositorySQL;
-use App\Infrastructure\Repository\ParkingRepositorySQL;
-use App\Infrastructure\adaptaters\FirebaseJwtService;
-
-require_once __DIR__ . "/../vendor/autoload.php";
-
 function cors(): void
 {
   $allowedOrigins = [
@@ -44,6 +30,20 @@ function cors(): void
   }
 }
 cors();
+
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use App\Infrastructure\Core\Config\Router;
+use App\Infrastructure\Core\Config\Config;
+use App\Infrastructure\Core\Config\Database;
+use App\Infrastructure\Middleware\MiddlewareHandler;
+use App\Infrastructure\Repository\UserRepositorySQL;
+use App\Infrastructure\Repository\OwnerRepositorySQL;
+use App\Infrastructure\Repository\CustomerRepositorySQL;
+use App\Infrastructure\Repository\SubscriptionRepositorySQL;
+use App\Infrastructure\Repository\RateRepositorySQL;
+use App\Infrastructure\Repository\ParkingRepositorySQL;
+use App\Infrastructure\adaptaters\FirebaseJwtService;
 
 set_exception_handler(function ($e) {
   http_response_code(500);
@@ -74,7 +74,6 @@ $middlewareHandler = new MiddlewareHandler($jwtService, $userRepository);
 
 $url = $_SERVER["REQUEST_URI"];
 
-// Remove query string from URL
 if (($pos = strpos($url, "?")) !== false) {
   $url = substr($url, 0, $pos);
 }
@@ -108,7 +107,6 @@ try {
 } catch (Throwable $e) {
   $message = $e->getMessage();
 
-  // Check if it's a "no matching routes" exception
   if (
     strpos($message, "No matching routes") !== false ||
     strpos($message, "REQUEST_METHOD") !== false
@@ -121,7 +119,6 @@ try {
       "status" => 404,
     ]);
   } else {
-    // Log and return actual error for debugging
     error_log(
       "Router error: " .
         $message .

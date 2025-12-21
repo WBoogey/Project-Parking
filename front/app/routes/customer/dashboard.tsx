@@ -61,7 +61,7 @@ export default function CustomerDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-gray-50 flex items-center justify-center">
         <p className="text-secondary">Chargement...</p>
       </div>
     );
