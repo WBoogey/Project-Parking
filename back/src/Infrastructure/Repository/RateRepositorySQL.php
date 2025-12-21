@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infrastructure\Repository;
 
+use App\Domain\Parking\ParkingId;
 use App\Domain\Rate\Rate;
 use App\Domain\Rate\RateId;
 use App\Domain\Rate\RateRepositoryInterface;
@@ -21,6 +24,7 @@ class RateRepositorySQL implements RateRepositoryInterface
 
     if ($exists) {
       $sql = "UPDATE rates SET
+                parking_id = :parking_id,
                 type = :type,
                 calculation_rule = :calculation_rule,
                 price = :price,
@@ -28,13 +32,14 @@ class RateRepositorySQL implements RateRepositoryInterface
                 duration = :duration
               WHERE id = :id";
     } else {
-      $sql = "INSERT INTO rates (id, type, calculation_rule, price, hourly_discount, duration)
-              VALUES (:id, :type, :calculation_rule, :price, :hourly_discount, :duration)";
+      $sql = "INSERT INTO rates (id, parking_id, type, calculation_rule, price, hourly_discount, duration)
+              VALUES (:id, :parking_id, :type, :calculation_rule, :price, :hourly_discount, :duration)";
     }
 
     $stmt = $this->connection->prepare($sql);
     $stmt->execute([
       ":id" => $rate->getId()->toString(),
+      ":parking_id" => $rate->getParkingId()->toString(),
       ":type" => $rate->getType()->value,
       ":calculation_rule" => $rate->getCalculationRule(),
       ":price" => $rate->getPrice(),
@@ -45,7 +50,7 @@ class RateRepositorySQL implements RateRepositoryInterface
 
   public function findById(RateId $id): ?Rate
   {
-    $sql = "SELECT id, type, calculation_rule, price, hourly_discount, duration
+    $sql = "SELECT id, parking_id, type, calculation_rule, price, hourly_discount, duration
             FROM rates
             WHERE id = :id";
     $stmt = $this->connection->prepare($sql);
@@ -61,7 +66,7 @@ class RateRepositorySQL implements RateRepositoryInterface
 
   public function findByPrice(float $price): ?Rate
   {
-    $sql = "SELECT id, type, calculation_rule, price, hourly_discount, duration
+    $sql = "SELECT id, parking_id, type, calculation_rule, price, hourly_discount, duration
             FROM rates
             WHERE price = :price";
     $stmt = $this->connection->prepare($sql);
@@ -80,11 +85,39 @@ class RateRepositorySQL implements RateRepositoryInterface
    */
   public function findByType(RateType $type): array
   {
-    $sql = "SELECT id, type, calculation_rule, price, hourly_discount, duration
+    $sql = "SELECT id, parking_id, type, calculation_rule, price, hourly_discount, duration
             FROM rates
             WHERE type = :type";
     $stmt = $this->connection->prepare($sql);
     $stmt->execute([":type" => $type->value]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(fn(array $data) => $this->hydrateRate($data), $results);
+  }
+
+  /**
+   * @return Rate[]
+   */
+  public function findByParkingId(ParkingId $parkingId): array
+  {
+    $sql = "SELECT id, parking_id, type, calculation_rule, price, hourly_discount, duration
+            FROM rates
+            WHERE parking_id = :parking_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([":parking_id" => $parkingId->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(fn(array $data) => $this->hydrateRate($data), $results);
+  }
+
+  /**
+   * @return Rate[]
+   */
+  public function findAll(): array
+  {
+    $sql = "SELECT id, parking_id, type, calculation_rule, price, hourly_discount, duration
+            FROM rates";
+    $stmt = $this->connection->query($sql);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     return array_map(fn(array $data) => $this->hydrateRate($data), $results);
@@ -100,6 +133,7 @@ class RateRepositorySQL implements RateRepositoryInterface
   private function hydrateRate(array $data): Rate
   {
     return Rate::create(
+      parkingId: ParkingId::fromString($data["parking_id"]),
       type: RateType::from($data["type"]),
       calculationRule: $data["calculation_rule"],
       price: (float) $data["price"],
