@@ -65,7 +65,12 @@ const AuthForm = ({
       return email.trim() !== "" && password.trim() !== "";
     }
     if (isSignup) {
-      return firstName.trim() !== "" && lastName.trim() !== "";
+      return (
+        firstName.trim() !== "" &&
+        lastName.trim() !== "" &&
+        email.trim() !== "" &&
+        password.trim() !== ""
+      );
     }
     if (isSignupPro) {
       return (
