@@ -1,9 +1,10 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import ParkingCard from "@/components/organisms/ParkingCard";
 import Button from "@/components/atoms/Button";
 import { useDeleteParking, useOwnerParkings } from "@/hooks/useOwner";
 
 export default function OwnerDashboard() {
+  const navigate = useNavigate();
   const { data: parkings, isLoading, error } = useOwnerParkings();
   const deleteMutation = useDeleteParking();
 
@@ -54,6 +55,8 @@ export default function OwnerDashboard() {
             key={parking.id}
             name={parking.location}
             totalSpots={parking.capacity}
+            onEdit={() => navigate(`/owner/parkings/${parking.id}/rates`)}
+            editLabel="Gérer les tarifs"
             onDelete={() => {
               if (confirm("Voulez-vous vraiment supprimer ce parking ?")) {
                 deleteMutation.mutate(parking.id);
@@ -67,7 +70,7 @@ export default function OwnerDashboard() {
             <p className="text-gray-500 mb-4">
               Vous n&apos;avez pas encore ajouté de parking.
             </p>
-            <Link to="/owner/parkings/add">
+            <Link to="/owner/parkings/add" className="inline-block">
               <Button
                 onClick={() => {}}
                 variant="outline"

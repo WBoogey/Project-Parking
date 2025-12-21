@@ -17,6 +17,7 @@ export default [
 
     route("owner", "routes/owner/dashboard.tsx"),
     route("owner/parkings/add", "routes/owner/add-parking.tsx"),
+    route("owner/parkings/:id/rates", "routes/owner/parkings/rates.tsx"),
 
     route("customer", "routes/customer/dashboard.tsx"),
   ]),

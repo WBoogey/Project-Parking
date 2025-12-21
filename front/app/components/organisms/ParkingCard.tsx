@@ -27,30 +27,30 @@ const ParkingCard = ({
     <div
       data-testid="parking-card"
       className={cn(
-        "w-full flex items-center justify-between p-5 border border-tertiary rounded-3xl bg-primary",
+        "w-full flex flex-col gap-4 p-5 border border-tertiary rounded-3xl bg-primary",
         className,
       )}
     >
-      <div className="flex flex-col gap-1">
-        <h3 className="text-secondary font-medium font-inter">{name}</h3>
-        <div>
-          <p className="text-tertiary font-medium font-inter">
-            Nombre de places : {totalSpots}
-          </p>
-          {typeof availableSpots === "number" && (
-            <SpotsStatus capacity={availableSpots} />
-          )}
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
+      <h3 className="text-secondary font-semibold text-lg">{name}</h3>
+
+      <div className="flex items-center justify-between">
+        <p className="text-tertiary font-medium">
+          Nombre de places : {totalSpots}
+        </p>
+        {typeof availableSpots === "number" && (
+          <SpotsStatus capacity={availableSpots} />
+        )}
         {price && (
           <span className="text-secondary font-bold whitespace-nowrap">
             {price}
           </span>
         )}
-        <div className="flex gap-2">
+      </div>
+
+      {(onEdit || onDelete) && (
+        <div className="flex gap-3 w-full">
           {onEdit && (
-            <Button onClick={onEdit} size="sm">
+            <Button onClick={onEdit} size="sm" className="flex-1">
               {editLabel}
             </Button>
           )}
@@ -59,16 +59,15 @@ const ParkingCard = ({
               onClick={onDelete}
               size="sm"
               variant="outline"
-              className="text-red-500 border-red-500 hover:bg-red-50"
+              className="flex-1 text-red-500 border-red-500 hover:bg-red-50"
             >
               Supprimer
             </Button>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
 export default ParkingCard;
-

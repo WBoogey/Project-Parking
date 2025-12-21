@@ -163,15 +163,17 @@ describe("AuthForm", () => {
     });
 
     it("should enable submit button when required fields are filled in signup mode", async () => {
-      // Arrange
       render(<AuthForm mode="signup" {...mockProps} />);
       const user = userEvent.setup();
 
-      // Act
       await user.type(screen.getByLabelText(/Prénom/), "Jean");
       await user.type(screen.getByLabelText(/^Nom/), "Dupont");
+      await user.type(screen.getByLabelText(/Email/), "jean@test.com");
+      await user.type(
+        screen.getByPlaceholderText("Votre mot de passe"),
+        "password123",
+      );
 
-      // Assert
       expect(screen.getByText("Confirmer")).toBeEnabled();
     });
   });

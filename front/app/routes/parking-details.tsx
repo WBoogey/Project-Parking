@@ -2,6 +2,15 @@ import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import { useParking } from "@/hooks/useParkings";
 import { useUser } from "@/hooks/useUser";
+import type { RateType } from "@/types/OwnerTypes";
+
+const RATE_LABELS: Record<RateType, string> = {
+  hourly: "1 Heure",
+  daily: "1 Journée",
+  weekly_subscription: "1 Semaine",
+  monthly_subscription: "1 Mois",
+  yearly_subscription: "1 An",
+};
 
 export default function ParkingDetails() {
   const { id } = useParams();
@@ -66,9 +75,11 @@ export default function ParkingDetails() {
                   key={rate.id}
                   className="flex justify-between items-center pb-4 border-b border-gray-100"
                 >
-                  <span className="text-gray-600">{rate.name}</span>
+                  <span className="text-gray-600">
+                    {RATE_LABELS[rate.type] || rate.type}
+                  </span>
                   <span className="font-bold text-secondary">
-                    {rate.amount}€
+                    {rate.price}€
                   </span>
                 </div>
               ))

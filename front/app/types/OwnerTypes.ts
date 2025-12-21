@@ -1,13 +1,24 @@
+export type RateType =
+  | "hourly"
+  | "daily"
+  | "weekly_subscription"
+  | "monthly_subscription"
+  | "yearly_subscription";
+
 export interface Rate {
   id: string;
   parkingId: string;
-  name: string;
-  duration: number;
-  amount: number;
+  type: RateType;
+  calculationRule: string;
+  price: number;
+  hourlyDiscount: number | null;
+  duration: string | null;
 }
 
 export interface CreateRateData {
-  name: string;
-  duration: number;
-  amount: number;
+  type: RateType;
+  calculationRule: string;
+  price: number;
+  hourlyDiscount?: number;
+  duration?: string;
 }

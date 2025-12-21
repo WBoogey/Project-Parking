@@ -4,16 +4,18 @@ import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
 import ParkingCard from "@/components/organisms/ParkingCard";
 import { useParkings } from "@/hooks/useParkings";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function Search() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
 
-  const { data: parkings, isLoading } = useParkings(searchTerm);
+  const { data: parkings, isLoading } = useParkings(debouncedSearch);
 
-  const getMinPrice = (rates: { amount: number }[]) => {
+  const getMinPrice = (rates: { price: number }[]) => {
     if (!rates || rates.length === 0) return null;
-    const min = Math.min(...rates.map((r) => r.amount));
+    const min = Math.min(...rates.map((r) => r.price));
     return `${min}€`;
   };
 

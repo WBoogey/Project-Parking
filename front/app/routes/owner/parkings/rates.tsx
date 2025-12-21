@@ -1,0 +1,224 @@
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router";
+import Button from "@/components/atoms/Button";
+import InputComplete from "@/components/molecules/InputComplete";
+import {
+  useOwnerRates,
+  useCreateRate,
+  useDeleteRate,
+} from "@/hooks/useOwner";
+import type { RateType } from "@/types/OwnerTypes";
+
+const RATE_TYPE_OPTIONS: { value: RateType; label: string }[] = [
+  { value: "hourly", label: "Horaire" },
+  { value: "daily", label: "Journalier" },
+  { value: "weekly_subscription", label: "Abonnement hebdomadaire" },
+  { value: "monthly_subscription", label: "Abonnement mensuel" },
+  { value: "yearly_subscription", label: "Abonnement annuel" },
+];
+
+const RATE_LABELS: Record<RateType, string> = {
+  hourly: "Horaire",
+  daily: "Journalier",
+  weekly_subscription: "Hebdomadaire",
+  monthly_subscription: "Mensuel",
+  yearly_subscription: "Annuel",
+};
+
+export default function ManageRates() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const parkingId = id || "";
+
+  const { data: rates, isLoading } = useOwnerRates(parkingId);
+  const createMutation = useCreateRate(parkingId);
+  const deleteMutation = useDeleteRate(parkingId);
+
+  const [showForm, setShowForm] = useState(false);
+  const [newRate, setNewRate] = useState({
+    type: "hourly" as RateType,
+    calculationRule: "per_hour",
+    price: "",
+    hourlyDiscount: "",
+    duration: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRate.price) return;
+
+    createMutation.mutate(
+      {
+        type: newRate.type,
+        calculationRule: newRate.calculationRule,
+        price: parseFloat(newRate.price),
+        hourlyDiscount: newRate.hourlyDiscount
+          ? parseFloat(newRate.hourlyDiscount)
+          : undefined,
+        duration: newRate.duration || undefined,
+      },
+      {
+        onSuccess: () => {
+          setShowForm(false);
+          setNewRate({
+            type: "hourly",
+            calculationRule: "per_hour",
+            price: "",
+            hourlyDiscount: "",
+            duration: "",
+          });
+        },
+      },
+    );
+  };
+
+  const handleDelete = (rateId: string) => {
+    deleteMutation.mutate(rateId);
+  };
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Chargement des tarifs...</div>;
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold text-secondary">Gestion des tarifs</h1>
+        <Button variant="outline" onClick={() => navigate("/owner")}>
+          Retour
+        </Button>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden">
+        {rates && rates.length > 0 ? (
+          <div className="divide-y divide-gray-100">
+            {rates.map((rate) => (
+              <div
+                key={rate.id}
+                className="p-6 flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-bold text-secondary">
+                    {RATE_LABELS[rate.type] || rate.type}
+                  </p>
+                  <p className="text-tertiary text-sm">
+                    {rate.price}€ - {rate.calculationRule}
+                    {rate.hourlyDiscount && ` (réduction: ${rate.hourlyDiscount * 100}%)`}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => handleDelete(rate.id)}
+                  disabled={deleteMutation.isPending}
+                >
+                  Supprimer
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center text-tertiary">
+            Aucun tarif configuré pour ce parking.
+          </div>
+        )}
+      </div>
+
+      {!showForm ? (
+        <div className="mt-6">
+          <Button onClick={() => setShowForm(true)}>Ajouter un tarif</Button>
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="mt-6 bg-white p-8 rounded-3xl border border-gray-200 flex flex-col gap-6"
+        >
+          <h2 className="text-xl font-bold text-secondary">Nouveau tarif</h2>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="type" className="text-sm font-medium text-secondary">
+              Type de tarif
+            </label>
+            <select
+              id="type"
+              value={newRate.type}
+              onChange={(e) =>
+                setNewRate({ ...newRate, type: e.target.value as RateType })
+              }
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {RATE_TYPE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <InputComplete
+            id="calculationRule"
+            label="Règle de calcul"
+            placeholder="ex: per_hour, per_day, monthly"
+            variant="full"
+            value={newRate.calculationRule}
+            onChange={(e) =>
+              setNewRate({ ...newRate, calculationRule: e.target.value })
+            }
+            required
+          />
+
+          <InputComplete
+            id="price"
+            label="Prix (€)"
+            placeholder="ex: 3.5"
+            type="number"
+            variant="full"
+            value={newRate.price}
+            onChange={(e) => setNewRate({ ...newRate, price: e.target.value })}
+            required
+          />
+
+          <InputComplete
+            id="hourlyDiscount"
+            label="Réduction horaire (optionnel, entre 0 et 1)"
+            placeholder="ex: 0.15"
+            type="number"
+            variant="full"
+            value={newRate.hourlyDiscount}
+            onChange={(e) =>
+              setNewRate({ ...newRate, hourlyDiscount: e.target.value })
+            }
+          />
+
+          <InputComplete
+            id="duration"
+            label="Durée (optionnel)"
+            placeholder="ex: 1 month"
+            variant="full"
+            value={newRate.duration}
+            onChange={(e) => setNewRate({ ...newRate, duration: e.target.value })}
+          />
+
+          <div className="flex justify-end gap-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowForm(false)}
+              type="button"
+            >
+              Annuler
+            </Button>
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending ? "Ajout..." : "Ajouter"}
+            </Button>
+          </div>
+
+          {createMutation.isError && (
+            <p className="text-red-500 text-sm">
+              Une erreur est survenue lors de l&apos;ajout.
+            </p>
+          )}
+        </form>
+      )}
+    </div>
+  );
+}
+
