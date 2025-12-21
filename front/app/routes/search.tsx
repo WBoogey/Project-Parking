@@ -11,6 +11,12 @@ export default function Search() {
 
   const { data: parkings, isLoading } = useParkings(searchTerm);
 
+  const getMinPrice = (rates: { amount: number }[]) => {
+    if (!rates || rates.length === 0) return null;
+    const min = Math.min(...rates.map((r) => r.amount));
+    return `${min}€`;
+  };
+
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-8">
       <div className="text-center space-y-4">
@@ -50,8 +56,7 @@ export default function Search() {
               <ParkingCard
                 name={parking.location}
                 totalSpots={parking.capacity}
-                availableSpots={parking.available}
-                price={parking.priceDisplay}
+                price={getMinPrice(parking.rates) || undefined}
                 onEdit={() => navigate(`/parking/${parking.id}`)}
                 editLabel="Voir"
                 className="hover:border-secondary transition-colors"
@@ -68,4 +73,3 @@ export default function Search() {
     </div>
   );
 }
-

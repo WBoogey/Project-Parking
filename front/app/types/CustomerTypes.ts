@@ -17,3 +17,11 @@ export interface Subscription {
   };
   parkingId: string;
 }
+
+export interface Stationing {
+  id: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  parkingId: string;
+}

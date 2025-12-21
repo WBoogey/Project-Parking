@@ -39,21 +39,18 @@ export default function ParkingDetails() {
         </div>
 
         <div>
-          <h2 className="text-xl font-bold text-secondary mb-4">Description</h2>
-          <p className="text-gray-600 leading-relaxed">{parking.description}</p>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold text-secondary mb-4">Services</h2>
-          <div className="flex flex-wrap gap-2">
-            {parking.features.map((f) => (
-              <span
-                key={f}
-                className="bg-white border border-tertiary/30 px-4 py-2 rounded-full text-secondary text-sm"
-              >
-                {f}
-              </span>
-            ))}
+          <h2 className="text-xl font-bold text-secondary mb-4">
+            Informations
+          </h2>
+          <div className="bg-white p-6 rounded-2xl border border-tertiary/20">
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-secondary">
+                  {parking.capacity}
+                </p>
+                <p className="text-sm text-tertiary">places</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -63,28 +60,25 @@ export default function ParkingDetails() {
           <h3 className="text-xl font-bold text-secondary mb-6">Tarifs</h3>
 
           <div className="space-y-4 mb-8">
-            <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-              <span className="text-gray-600">1 Heure</span>
-              <span className="font-bold text-secondary">
-                {parking.pricing.hourly}€
-              </span>
-            </div>
-            <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-              <span className="text-gray-600">1 Journée</span>
-              <span className="font-bold text-secondary">
-                {parking.pricing.daily}€
-              </span>
-            </div>
-            <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-              <span className="text-gray-600">1 Mois</span>
-              <span className="font-bold text-secondary">
-                {parking.pricing.monthly}€
-              </span>
-            </div>
+            {parking.rates && parking.rates.length > 0 ? (
+              parking.rates.map((rate) => (
+                <div
+                  key={rate.id}
+                  className="flex justify-between items-center pb-4 border-b border-gray-100"
+                >
+                  <span className="text-gray-600">{rate.name}</span>
+                  <span className="font-bold text-secondary">
+                    {rate.amount}€
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-tertiary italic">Aucun tarif disponible.</p>
+            )}
           </div>
 
           <Button size="full" onClick={handleReservation}>
-            Réserver maintenant
+            S&apos;abonner
           </Button>
           <p className="text-center text-xs text-gray-400 mt-4">
             Annulation gratuite jusqu&apos;à 24h avant
@@ -94,4 +88,3 @@ export default function ParkingDetails() {
     </div>
   );
 }
-

@@ -1,6 +1,7 @@
 import {
   useCustomerReservations,
   useCustomerSubscriptions,
+  useCustomerStationings,
 } from "@/hooks/useCustomer";
 
 export default function CustomerDashboard() {
@@ -8,8 +9,10 @@ export default function CustomerDashboard() {
     useCustomerReservations();
   const { data: subscriptions, isLoading: isLoadingSub } =
     useCustomerSubscriptions();
+  const { data: stationings, isLoading: isLoadingStat } =
+    useCustomerStationings();
 
-  const isLoading = isLoadingRes || isLoadingSub;
+  const isLoading = isLoadingRes || isLoadingSub || isLoadingStat;
 
   if (isLoading) {
     return (
@@ -82,8 +85,47 @@ export default function CustomerDashboard() {
             )}
           </div>
         </section>
+
+        <section>
+          <h2 className="text-xl font-bold text-secondary mb-4">
+            Mes Stationnements
+          </h2>
+          <div className="grid gap-4">
+            {stationings?.map((stat) => (
+              <div
+                key={stat.id}
+                className="bg-white p-6 rounded-2xl border border-tertiary/20 flex justify-between items-center"
+              >
+                <div>
+                  <p className="font-bold text-secondary">
+                    Parking #{stat.parkingId.substring(0, 8)}...
+                  </p>
+                  <p className="text-tertiary">
+                    Entrée : {new Date(stat.startTime).toLocaleString()}
+                  </p>
+                  {stat.endTime && (
+                    <p className="text-tertiary">
+                      Sortie : {new Date(stat.endTime).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                <div
+                  className={`px-4 py-2 rounded-xl text-sm font-medium ${
+                    stat.status === "in_progress"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {stat.status === "in_progress" ? "En cours" : stat.status}
+                </div>
+              </div>
+            ))}
+            {stationings?.length === 0 && (
+              <p className="text-tertiary italic">Aucun stationnement.</p>
+            )}
+          </div>
+        </section>
       </div>
     </>
   );
 }
-

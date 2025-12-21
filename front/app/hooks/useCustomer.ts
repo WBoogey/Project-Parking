@@ -15,3 +15,10 @@ export const useCustomerSubscriptions = () => {
     queryFn: customerApi.getSubscriptions,
   });
 };
+
+export const useCustomerStationings = () => {
+  return useQuery({
+    queryKey: queryKeys.customer.stationings(),
+    queryFn: customerApi.getStationings,
+  });
+};
