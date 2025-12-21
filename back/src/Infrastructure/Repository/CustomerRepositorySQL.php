@@ -1,12 +1,11 @@
 <?php
 
-
-
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Customer\CustomerRepositoryInterface;
 use App\Domain\User\UserId;
 use App\Domain\Parking\ParkingId;
+use App\Domain\Rate\RateId;
 use App\Domain\Reservation\Reservation;
 use App\Domain\Reservation\ReservationId;
 use App\Domain\Subscription\Subscription;
@@ -49,7 +48,7 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
   /** @return Subscription[] */
   public function getSubscriptions(UserId $customerId): array
   {
-    $sql = "SELECT id, start_date, end_date, rate, weekly_slots, user_id, parking_id
+    $sql = "SELECT id, start_date, end_date, rate_id, weekly_slots, user_id, parking_id
             FROM subscriptions
             WHERE user_id = :user_id";
     $stmt = $this->connection->prepare($sql);
@@ -62,7 +61,7 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
         parkingId: ParkingId::fromString($data["parking_id"]),
         startDate: $data["start_date"],
         endDate: $data["end_date"],
-        rate: (float) $data["rate"],
+        rateId: RateId::fromString($data["rate_id"]),
         weeklySlots: json_decode($data["weekly_slots"] ?? "[]", true),
         id: SubscriptionId::fromString($data["id"]),
       ),

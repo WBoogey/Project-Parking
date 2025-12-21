@@ -56,6 +56,16 @@ php -S localhost:8000 -t public
 | GET     | /api/customer/subscriptions | Liste des abonnements    |
 | GET     | /api/customer/stationings   | Liste des stationnements |
 
+### Subscriptions (authentifié)
+
+| Méthode | Endpoint               | Description            |
+| ------- | ---------------------- | ---------------------- |
+| GET     | /api/subscriptions     | Liste mes abonnements  |
+| GET     | /api/subscriptions/:id | Détail d'un abonnement |
+| POST    | /api/subscriptions     | Créer un abonnement    |
+| PUT     | /api/subscriptions/:id | Modifier un abonnement |
+| DELETE  | /api/subscriptions/:id | Annuler un abonnement  |
+
 ## Tests API (Bruno)
 
 ```bash
@@ -87,6 +97,13 @@ bru run owner/dashboard.bru --env local
 bru run owner/get-parkings.bru --env local
 bru run owner/add-parking.bru --env local
 bru run owner/remove-parking.bru --env local
+
+# Subscriptions
+bru run subscriptions/list.bru --env local
+bru run subscriptions/create.bru --env local
+bru run subscriptions/show.bru --env local
+bru run subscriptions/update.bru --env local
+bru run subscriptions/cancel.bru --env local
 ```
 
 ### Chaînes de tests (requiert auth)
@@ -97,6 +114,9 @@ bru run auth/signup.bru users/me.bru users/update-profile.bru customer/dashboard
 
 # Flow Owner complet
 bru run auth/signup-owner.bru users/me.bru owner/dashboard.bru owner/get-parkings.bru owner/add-parking.bru owner/remove-parking.bru --env local
+
+# Flow Subscription complet (nécessite parkingId et rateId existants)
+bru run auth/signup.bru subscriptions/list.bru subscriptions/create.bru subscriptions/show.bru subscriptions/update.bru subscriptions/cancel.bru --env local
 
 # Signup → Signin → Me → Update → Signout
 bru run auth/signup.bru auth/signout.bru auth/signin.bru users/me.bru users/update-profile.bru auth/signout.bru --env local
@@ -114,6 +134,7 @@ bru run --env local
 - `signup` ou `signin` doit être exécuté en premier pour obtenir le cookie `auth_token`
 - Les endpoints `/api/owner/*` nécessitent un utilisateur avec `role: "owner"`
 - Les endpoints `/api/customer/*` nécessitent un utilisateur avec `role: "customer"`
+- Les tests de subscription nécessitent des `parkingId` et `rateId` valides en base
 
 ## Structure du projet
 
@@ -128,32 +149,38 @@ back/
 │   │   │   └── Application/     # Use-cases (GetParkings, AddParking, etc.)
 │   │   ├── Customer/
 │   │   │   └── Application/     # Use-cases (GetReservations, etc.)
+│   │   ├── Subscription/
+│   │   │   └── Application/     # Use-cases (Create, Update, Cancel, etc.)
 │   │   ├── Parking/
 │   │   ├── Reservation/
-│   │   ├── Subscription/
 │   │   ├── Stationing/
 │   │   ├── Rate/
+│   │   ├── Payment/             # DTOs pour Stripe (PaymentRequest, etc.)
+│   │   ├── Port/                # Interfaces (JwtService, PaymentGateway)
 │   │   ├── Schedule/
 │   │   └── TimeInterval/
 │   ├── HTTP/
 │   │   ├── UserController.php
 │   │   ├── OwnerController.php
-│   │   └── CustomerController.php
+│   │   ├── CustomerController.php
+│   │   └── SubscriptionController.php
 │   ├── Services/
 │   │   ├── UserService.php
 │   │   ├── OwnerService.php
-│   │   └── CustomerService.php
+│   │   ├── CustomerService.php
+│   │   └── SubscriptionService.php
 │   ├── Helper/
 │   ├── Infrastructure/
 │   │   ├── Core/Config/
 │   │   ├── Core/Domain/
 │   │   ├── Middleware/
 │   │   ├── Repository/
-│   │   └── adaptaters/
+│   │   └── adaptaters/          # JWT, Stripe adapters
 │   └── routes/
 │       ├── user.php
 │       ├── owner.php
 │       ├── customer.php
+│       ├── subscription.php
 │       └── app.php
 ├── database/
 ├── docs/api/
@@ -161,6 +188,7 @@ back/
 │   ├── users/
 │   ├── owner/
 │   ├── customer/
+│   ├── subscriptions/
 │   └── environments/
 └── tests/
 ```
@@ -174,3 +202,17 @@ JWT stocké dans cookie HttpOnly `auth_token`.
 - `customer` (défaut) - Accès aux endpoints customer
 - `owner` - Accès aux endpoints owner
 - `admin` - Accès administrateur
+
+## Paiement (Stripe)
+
+Configuration dans `.env` :
+
+```
+STRIPE_PUBLIC_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+```
+
+L'intégration Stripe utilise le pattern Port/Adapter :
+
+- `Domain/Port/PaymentGatewayInterface.php` - Interface abstraite
+- `Infrastructure/adaptaters/StripePaymentAdapter.php` - Implémentation Stripe
