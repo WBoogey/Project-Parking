@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Infrastructure\Repository;
 
 use App\Domain\Parking\Parking;
@@ -81,6 +83,19 @@ class ParkingRepositorySQL implements ParkingRepositoryInterface
             WHERE owner_id = :owner_id";
     $stmt = $this->connection->prepare($sql);
     $stmt->execute([":owner_id" => $ownerId->toString()]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_map(fn(array $data) => $this->hydrateParking($data), $results);
+  }
+
+  /**
+   * @return Parking[]
+   */
+  public function findAll(): array
+  {
+    $sql = "SELECT id, location, capacity, owner_id
+            FROM parkings";
+    $stmt = $this->connection->query($sql);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     return array_map(fn(array $data) => $this->hydrateParking($data), $results);
