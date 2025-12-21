@@ -1,0 +1,48 @@
+# =============================================================================
+# Dockerfile.frontend - Production build for React Router frontend
+# =============================================================================
+
+# Stage 1: Install all dependencies (including dev)
+FROM node:20-alpine AS development-dependencies-env
+WORKDIR /app
+COPY front/package.json front/package-lock.json ./
+RUN npm ci
+
+# Stage 2: Install production dependencies only
+FROM node:20-alpine AS production-dependencies-env
+WORKDIR /app
+COPY front/package.json front/package-lock.json ./
+RUN npm ci --omit=dev
+
+# Stage 3: Build the application
+FROM node:20-alpine AS build-env
+WORKDIR /app
+COPY front/ ./
+COPY --from=development-dependencies-env /app/node_modules ./node_modules
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+RUN npm run build
+
+# Stage 4: Production image
+FROM node:20-alpine AS production
+WORKDIR /app
+
+# Copy package files
+COPY front/package.json front/package-lock.json ./
+
+# Copy production dependencies
+COPY --from=production-dependencies-env /app/node_modules ./node_modules
+
+# Copy built application
+COPY --from=build-env /app/build ./build
+
+# Expose port 5173
+EXPOSE 5173
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=5173
+
+# Start the server on port 5173
+CMD ["npx", "react-router-serve", "--port", "5173", "./build/server/index.js"]
+
