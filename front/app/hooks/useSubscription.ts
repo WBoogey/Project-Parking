@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { subscriptionApi } from "@/api/subscriptionApi";
 import { queryKeys } from "@/api/queryKeyFactory";
-import type { CreateSubscriptionData } from "@/types/SubscriptionTypes";
+import type {
+  CreateSubscriptionData,
+  SubscriptionType,
+  WeeklySlot,
+} from "@/types/SubscriptionTypes";
 
 export const useSubscriptions = () => {
   return useQuery({
@@ -18,11 +22,40 @@ export const useSubscription = (id: string) => {
   });
 };
 
+export const useSubscriptionDetails = (id: string) => {
+  return useQuery({
+    queryKey: queryKeys.subscription.detail(id),
+    queryFn: () => subscriptionApi.getSubscriptionDetails(id),
+    enabled: !!id,
+  });
+};
+
 export const useCreateSubscription = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateSubscriptionData) =>
       subscriptionApi.createSubscription(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.subscription.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.customer.subscriptions(),
+      });
+    },
+  });
+};
+
+export const useSubscribe = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      parkingId,
+      data,
+    }: {
+      parkingId: string;
+      data: Omit<CreateSubscriptionData, "parkingId">;
+    }) => subscriptionApi.subscribe(parkingId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.subscription.list(),
@@ -67,5 +100,31 @@ export const useCancelSubscription = () => {
         queryKey: queryKeys.customer.subscriptions(),
       });
     },
+  });
+};
+
+export const useSubscriptionPrice = (
+  parkingId: string,
+  subscriptionType: SubscriptionType,
+  durationMonths: number,
+  customSlots?: WeeklySlot[],
+) => {
+  return useQuery({
+    queryKey: [
+      "subscription",
+      "price",
+      parkingId,
+      subscriptionType,
+      durationMonths,
+      customSlots,
+    ],
+    queryFn: () =>
+      subscriptionApi.calculatePrice(
+        parkingId,
+        subscriptionType,
+        durationMonths,
+        customSlots,
+      ),
+    enabled: !!parkingId && !!subscriptionType && durationMonths > 0,
   });
 };

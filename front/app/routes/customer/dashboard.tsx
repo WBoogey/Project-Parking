@@ -1,10 +1,15 @@
+import { useNavigate } from "react-router";
 import {
   useCustomerReservations,
   useCustomerSubscriptions,
   useCustomerStationings,
 } from "@/hooks/useCustomer";
+import { useCancelSubscription } from "@/hooks/useSubscription";
+import SubscriptionCard from "@/components/molecules/SubscriptionCard";
+import type { SubscriptionDetail } from "@/types/SubscriptionTypes";
 
 export default function CustomerDashboard() {
+  const navigate = useNavigate();
   const { data: reservations, isLoading: isLoadingRes } =
     useCustomerReservations();
   const { data: subscriptions, isLoading: isLoadingSub } =
@@ -12,7 +17,47 @@ export default function CustomerDashboard() {
   const { data: stationings, isLoading: isLoadingStat } =
     useCustomerStationings();
 
+  const cancelMutation = useCancelSubscription();
+
   const isLoading = isLoadingRes || isLoadingSub || isLoadingStat;
+
+  const handleViewDetails = (id: string) => {
+    navigate(`/subscription/${id}`);
+  };
+
+  const handleCancel = (id: string) => {
+    cancelMutation.mutate(id);
+  };
+
+  const mapToSubscriptionDetail = (sub: {
+    id: string;
+    startDate: string;
+    endDate: string;
+    rate: { id: string; name: string; amount: number };
+    parkingId: string;
+  }): SubscriptionDetail => {
+    let subscriptionType: SubscriptionDetail["subscriptionType"] = "custom";
+    const rateName = sub.rate.name.toLowerCase();
+    if (rateName.includes("total") || rateName.includes("24")) {
+      subscriptionType = "total";
+    } else if (rateName.includes("week") || rateName.includes("end")) {
+      subscriptionType = "weekend";
+    } else if (rateName.includes("soir") || rateName.includes("evening")) {
+      subscriptionType = "evening";
+    }
+
+    return {
+      id: sub.id,
+      userId: "",
+      parkingId: sub.parkingId,
+      subscriptionType,
+      startDate: sub.startDate,
+      endDate: sub.endDate,
+      weeklySlots: [],
+      status: new Date(sub.endDate) > new Date() ? "active" : "expired",
+      monthlyPrice: sub.rate.amount,
+    };
+  };
 
   if (isLoading) {
     return (
@@ -62,23 +107,13 @@ export default function CustomerDashboard() {
           </h2>
           <div className="grid gap-4">
             {subscriptions?.map((sub) => (
-              <div
+              <SubscriptionCard
                 key={sub.id}
-                className="bg-white p-6 rounded-2xl border border-tertiary/20 flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-bold text-secondary">
-                    Parking #{sub.parkingId.substring(0, 8)}...
-                  </p>
-                  <p className="text-tertiary">
-                    Du {new Date(sub.startDate).toLocaleDateString()} au{" "}
-                    {new Date(sub.endDate).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="px-4 py-2 bg-accent/10 text-accent rounded-xl text-sm font-medium">
-                  Actif
-                </div>
-              </div>
+                subscription={mapToSubscriptionDetail(sub)}
+                onViewDetails={handleViewDetails}
+                onCancel={handleCancel}
+                isLoading={cancelMutation.isPending}
+              />
             ))}
             {subscriptions?.length === 0 && (
               <p className="text-tertiary italic">Aucun abonnement.</p>

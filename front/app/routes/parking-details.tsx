@@ -9,12 +9,12 @@ export default function ParkingDetails() {
   const { data: parking, isLoading } = useParking(id);
   const { data: user } = useUser();
 
-  const handleReservation = () => {
+  const handleSubscribe = () => {
     if (!user) {
       navigate("/login");
       return;
     }
-    navigate("/payment", { state: { parkingId: parking?.id } });
+    navigate(`/parking/${parking?.id}/subscribe`);
   };
 
   if (isLoading) return <div className="p-8 text-center">Chargement...</div>;
@@ -77,7 +77,7 @@ export default function ParkingDetails() {
             )}
           </div>
 
-          <Button size="full" onClick={handleReservation}>
+          <Button size="full" onClick={handleSubscribe}>
             S&apos;abonner
           </Button>
           <p className="text-center text-xs text-gray-400 mt-4">

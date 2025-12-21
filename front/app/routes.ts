@@ -10,6 +10,7 @@ export default [
     index("routes/home.tsx"),
     route("search", "routes/search.tsx"),
     route("parking/:id", "routes/parking-details.tsx"),
+    route("parking/:id/subscribe", "routes/parking/subscribe.tsx"),
     route("payment", "routes/payment.tsx"),
 
     route("owner", "routes/owner/dashboard.tsx"),
