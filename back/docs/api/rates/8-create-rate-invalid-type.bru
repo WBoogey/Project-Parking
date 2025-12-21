@@ -1,0 +1,57 @@
+meta {
+  name: 8. Create Rate Invalid Type
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/owner/parkings/{{parkingId}}/rates
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "type": "invalid_type",
+    "price": 50.00,
+    "calculationRule": "fixed"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 422 for invalid rate type", function() {
+    expect(res.status).to.equal(422);
+  });
+
+  test("should have error type", function() {
+    expect(res.body.type).to.equal("https://httpstatuses.com/422");
+  });
+
+  test("should have Unprocessable Entity title", function() {
+    expect(res.body.title).to.equal("Unprocessable Entity");
+  });
+
+  test("should mention invalid rate type in detail", function() {
+    expect(res.body.detail).to.include("Invalid rate type");
+  });
+
+  test("should list valid types in detail", function() {
+    expect(res.body.detail).to.include("hourly");
+    expect(res.body.detail).to.include("daily");
+    expect(res.body.detail).to.include("weekly_subscription");
+    expect(res.body.detail).to.include("monthly_subscription");
+    expect(res.body.detail).to.include("yearly_subscription");
+  });
+
+  test("should have status 422 in body", function() {
+    expect(res.body.status).to.equal(422);
+  });
+}

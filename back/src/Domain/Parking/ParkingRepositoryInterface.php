@@ -1,6 +1,6 @@
 <?php
 
-
+declare(strict_types=1);
 
 namespace App\Domain\Parking;
 
@@ -18,6 +18,11 @@ interface ParkingRepositoryInterface
    * @return Parking[]
    */
   public function findByOwnerId(UserId $ownerId): array;
+
+  /**
+   * @return Parking[]
+   */
+  public function findAll(): array;
 
   public function delete(Parking $parking): void;
 }

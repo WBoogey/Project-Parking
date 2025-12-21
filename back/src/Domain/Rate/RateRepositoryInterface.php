@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Rate;
+
+use App\Domain\Parking\ParkingId;
 
 interface RateRepositoryInterface
 {
@@ -14,6 +18,16 @@ interface RateRepositoryInterface
    * @return Rate[]
    */
   public function findByType(RateType $type): array;
+
+  /**
+   * @return Rate[]
+   */
+  public function findByParkingId(ParkingId $parkingId): array;
+
+  /**
+   * @return Rate[]
+   */
+  public function findAll(): array;
 
   public function delete(Rate $rate): void;
 }

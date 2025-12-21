@@ -3,11 +3,12 @@
 namespace App\Domain\Subscription;
 
 use App\Domain\Parking\ParkingId;
+use App\Domain\Rate\RateId;
 use App\Domain\User\UserId;
 use App\Infrastructure\Core\Domain\Entity;
 
 /**
- * @extends Entity<array{id: SubscriptionId, userId: UserId, parkingId: ParkingId, startDate: string, endDate: string, rate: float, weeklySlots: array}>
+ * @extends Entity<array{id: SubscriptionId, userId: UserId, parkingId: ParkingId, startDate: string, endDate: string, rateId: RateId, weeklySlots: array}>
  */
 class Subscription extends Entity
 {
@@ -17,7 +18,7 @@ class Subscription extends Entity
     ParkingId $parkingId,
     string $startDate,
     string $endDate,
-    float $rate,
+    RateId $rateId,
     array $weeklySlots,
   ) {
     parent::__construct([
@@ -26,7 +27,7 @@ class Subscription extends Entity
       "parkingId" => $parkingId,
       "startDate" => $startDate,
       "endDate" => $endDate,
-      "rate" => $rate,
+      "rateId" => $rateId,
       "weeklySlots" => $weeklySlots,
     ]);
   }
@@ -36,7 +37,7 @@ class Subscription extends Entity
     ParkingId $parkingId,
     string $startDate,
     string $endDate,
-    float $rate,
+    RateId $rateId,
     array $weeklySlots = [],
     ?SubscriptionId $id = null,
   ): self {
@@ -46,7 +47,7 @@ class Subscription extends Entity
       parkingId: $parkingId,
       startDate: $startDate,
       endDate: $endDate,
-      rate: $rate,
+      rateId: $rateId,
       weeklySlots: $weeklySlots,
     );
   }
@@ -76,9 +77,9 @@ class Subscription extends Entity
     return $this->props["endDate"];
   }
 
-  public function getRate(): float
+  public function getRateId(): RateId
   {
-    return $this->props["rate"];
+    return $this->props["rateId"];
   }
 
   /**
