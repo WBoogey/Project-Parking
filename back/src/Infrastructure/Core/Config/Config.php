@@ -34,6 +34,12 @@ class Config
       "stripe" => [
         "public_key" => $_ENV["STRIPE_PUBLIC_KEY"] ?? "",
         "secret_key" => $_ENV["STRIPE_SECRET_KEY"] ?? "",
+        "webhook_secret" => $_ENV["STRIPE_WEBHOOK_SECRET"] ?? "",
+        "success_url" =>
+          $_ENV["STRIPE_SUCCESS_URL"] ??
+          "http://localhost:3000/payment/success",
+        "cancel_url" =>
+          $_ENV["STRIPE_CANCEL_URL"] ?? "http://localhost:3000/payment/cancel",
       ],
     ];
   }
