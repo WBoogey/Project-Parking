@@ -43,6 +43,49 @@ export default function CustomerDashboard() {
     (s) => s.status === "in_progress" || s.status === "active",
   );
 
+  const getReservationForStationing = () => {
+    if (!activeStationing || !reservations) return null;
+    return reservations.find(
+      (r) =>
+        r.parkingId === activeStationing.parkingId &&
+        (r.status === "confirmed" || r.status === "pending"),
+    );
+  };
+
+  const getOvertimeInfo = () => {
+    if (!activeStationing) return null;
+    const reservation = getReservationForStationing();
+    if (!reservation) return null;
+
+    const now = new Date();
+    const reservationEnd = new Date(reservation.endTime);
+    const diffMs = now.getTime() - reservationEnd.getTime();
+
+    if (diffMs <= 0) {
+      const remainingMs = reservationEnd.getTime() - now.getTime();
+      const remainingMin = Math.ceil(remainingMs / 60000);
+      if (remainingMin <= 15) {
+        return {
+          isOvertime: false,
+          isWarning: true,
+          message: `Attention : ${remainingMin} min restantes avant dépassement`,
+          remainingMinutes: remainingMin,
+        };
+      }
+      return null;
+    }
+
+    const overtimeMin = Math.ceil(diffMs / 60000);
+    return {
+      isOvertime: true,
+      isWarning: false,
+      message: `Dépassement de ${overtimeMin} min - Pénalité de 20€ applicable`,
+      overtimeMinutes: overtimeMin,
+    };
+  };
+
+  const overtimeInfo = getOvertimeInfo();
+
   const getParkingName = (parkingId: string): string => {
     const parking = parkings?.find((p) => p.id === parkingId);
     return parking?.location || `Parking #${parkingId.substring(0, 8)}...`;
@@ -58,14 +101,16 @@ export default function CustomerDashboard() {
   const canEnterReservation = (
     parkingId: string,
     startTime: string,
+    endTime: string,
     status: string,
   ): boolean => {
     if (activeStationing) return false;
-    if (status !== "confirmed") return false;
+    if (status !== "confirmed" && status !== "pending") return false;
     const now = new Date();
     const start = new Date(startTime);
+    const end = new Date(endTime);
     const thirtyMinBefore = new Date(start.getTime() - 30 * 60 * 1000);
-    return now >= thirtyMinBefore;
+    return now >= thirtyMinBefore && now <= end;
   };
 
   const handleEnterFromReservation = (parkingId: string) => {
@@ -160,8 +205,39 @@ export default function CustomerDashboard() {
 
       <div className="grid gap-8">
         {activeStationing && (
-          <section className="bg-gradient-to-r from-green-500 to-green-600 p-8 rounded-3xl text-white">
+          <section
+            className={`p-8 rounded-3xl text-white ${
+              overtimeInfo?.isOvertime
+                ? "bg-gradient-to-r from-red-500 to-red-600"
+                : overtimeInfo?.isWarning
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600"
+                  : "bg-gradient-to-r from-green-500 to-green-600"
+            }`}
+          >
             <h2 className="text-xl font-bold mb-4">Stationnement en cours</h2>
+
+            {overtimeInfo && (
+              <div
+                className={`p-4 rounded-2xl mb-4 flex items-center gap-3 ${
+                  overtimeInfo.isOvertime
+                    ? "bg-white/30"
+                    : "bg-white/20"
+                }`}
+              >
+                <span className="text-2xl">
+                  {overtimeInfo.isOvertime ? "⚠️" : "⏰"}
+                </span>
+                <div>
+                  <p className="font-bold">{overtimeInfo.message}</p>
+                  {overtimeInfo.isOvertime && (
+                    <p className="text-sm opacity-90">
+                      Sortez rapidement pour limiter les frais supplémentaires
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="bg-white/20 p-4 rounded-2xl mb-4">
               <p className="font-bold text-lg">
                 {getParkingName(activeStationing.parkingId)}
@@ -173,7 +249,11 @@ export default function CustomerDashboard() {
             <Button
               onClick={() => handleExitParking(activeStationing.parkingId)}
               size="full"
-              className="bg-white text-green-600 hover:bg-gray-100 text-xl py-6 font-bold"
+              className={`text-xl py-6 font-bold ${
+                overtimeInfo?.isOvertime
+                  ? "bg-white text-red-600 hover:bg-gray-100"
+                  : "bg-white text-green-600 hover:bg-gray-100"
+              }`}
               disabled={exitMutation.isPending}
             >
               {exitMutation.isPending ? "Sortie en cours..." : "SORTIR DU PARKING"}
@@ -191,6 +271,7 @@ export default function CustomerDashboard() {
               const canEnter = canEnterReservation(
                 res.parkingId,
                 res.startTime,
+                res.endTime,
                 res.status,
               );
               const isCurrentlyParkedHere =

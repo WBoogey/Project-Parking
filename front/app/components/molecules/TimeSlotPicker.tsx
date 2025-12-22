@@ -44,9 +44,9 @@ export default function TimeSlotPicker({
 
   const isSlotDisabled = (hour: number, minute: number): boolean => {
     if (!isToday) return false;
-    const slotTime = new Date(selectedDate);
-    slotTime.setHours(hour, minute, 0, 0);
-    return slotTime <= now;
+    const slotEnd = new Date(selectedDate);
+    slotEnd.setHours(hour, minute + 15, 0, 0);
+    return slotEnd <= now;
   };
 
   const isSlotBeforeStart = (hour: number, minute: number): boolean => {
