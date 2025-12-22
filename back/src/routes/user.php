@@ -1,6 +1,6 @@
 <?php
 
-use App\HTTP\UserController;
+use App\Infrastructure\HTTP\UserController;
 use App\Services\UserService;
 use App\Domain\User\Application\SignupWithEmailUser;
 use App\Domain\User\Application\SigninWithEmailUser;

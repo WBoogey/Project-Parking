@@ -1,6 +1,6 @@
 <?php
 
-namespace App\HTTP;
+namespace App\Infrastructure\HTTP;
 
 use App\Infrastructure\Core\Config\Controllers;
 use App\Infrastructure\Middleware\AuthContext;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HTTP;
+namespace App\Infrastructure\HTTP;
 
 use App\Domain\Parking\ParkingId;
 use App\Domain\Rate\Rate;
