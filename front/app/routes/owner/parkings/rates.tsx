@@ -1,12 +1,8 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
-import {
-  useOwnerRates,
-  useCreateRate,
-  useDeleteRate,
-} from "@/hooks/useOwner";
+import { useOwnerRates, useCreateRate, useDeleteRate } from "@/hooks/useOwner";
 import type { RateType } from "@/types/OwnerTypes";
 
 const RATE_TYPE_OPTIONS: { value: RateType; label: string }[] = [
@@ -25,6 +21,14 @@ const RATE_LABELS: Record<RateType, string> = {
   yearly_subscription: "Annuel",
 };
 
+const CALCULATION_RULES: Record<RateType, string> = {
+  hourly: "per_hour",
+  daily: "per_day",
+  weekly_subscription: "weekly",
+  monthly_subscription: "monthly",
+  yearly_subscription: "yearly",
+};
+
 export default function ManageRates() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -37,35 +41,34 @@ export default function ManageRates() {
   const [showForm, setShowForm] = useState(false);
   const [newRate, setNewRate] = useState({
     type: "hourly" as RateType,
-    calculationRule: "per_hour",
     price: "",
     hourlyDiscount: "",
-    duration: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!newRate.price) return;
+
+    const discountPercent = newRate.hourlyDiscount
+      ? parseFloat(newRate.hourlyDiscount)
+      : undefined;
+    const discountDecimal =
+      discountPercent !== undefined ? discountPercent / 100 : undefined;
 
     createMutation.mutate(
       {
         type: newRate.type,
-        calculationRule: newRate.calculationRule,
+        calculationRule: CALCULATION_RULES[newRate.type],
         price: parseFloat(newRate.price),
-        hourlyDiscount: newRate.hourlyDiscount
-          ? parseFloat(newRate.hourlyDiscount)
-          : undefined,
-        duration: newRate.duration || undefined,
+        hourlyDiscount: discountDecimal,
       },
       {
         onSuccess: () => {
           setShowForm(false);
           setNewRate({
             type: "hourly",
-            calculationRule: "per_hour",
             price: "",
             hourlyDiscount: "",
-            duration: "",
           });
         },
       },
@@ -83,7 +86,9 @@ export default function ManageRates() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-secondary">Gestion des tarifs</h1>
+        <h1 className="text-2xl font-bold text-secondary">
+          Gestion des tarifs
+        </h1>
         <Button variant="outline" onClick={() => navigate("/owner")}>
           Retour
         </Button>
@@ -102,8 +107,10 @@ export default function ManageRates() {
                     {RATE_LABELS[rate.type] || rate.type}
                   </p>
                   <p className="text-tertiary text-sm">
-                    {rate.price}€ - {rate.calculationRule}
-                    {rate.hourlyDiscount && ` (réduction: ${rate.hourlyDiscount * 100}%)`}
+                    {rate.price}€
+                    {rate.hourlyDiscount !== null &&
+                      rate.hourlyDiscount !== undefined &&
+                      ` (réduction: ${Math.round(rate.hourlyDiscount * 100)}%)`}
                   </p>
                 </div>
                 <Button
@@ -135,7 +142,10 @@ export default function ManageRates() {
           <h2 className="text-xl font-bold text-secondary">Nouveau tarif</h2>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="type" className="text-sm font-medium text-secondary">
+            <label
+              htmlFor="type"
+              className="text-sm font-medium text-secondary"
+            >
               Type de tarif
             </label>
             <select
@@ -155,21 +165,9 @@ export default function ManageRates() {
           </div>
 
           <InputComplete
-            id="calculationRule"
-            label="Règle de calcul"
-            placeholder="ex: per_hour, per_day, monthly"
-            variant="full"
-            value={newRate.calculationRule}
-            onChange={(e) =>
-              setNewRate({ ...newRate, calculationRule: e.target.value })
-            }
-            required
-          />
-
-          <InputComplete
             id="price"
             label="Prix (€)"
-            placeholder="ex: 3.5"
+            placeholder="ex: 3.50"
             type="number"
             variant="full"
             value={newRate.price}
@@ -179,23 +177,14 @@ export default function ManageRates() {
 
           <InputComplete
             id="hourlyDiscount"
-            label="Réduction horaire (optionnel, entre 0 et 1)"
-            placeholder="ex: 0.15"
+            label="Réduction horaire en % (optionnel)"
+            placeholder="ex: 15 pour 15%"
             type="number"
             variant="full"
             value={newRate.hourlyDiscount}
             onChange={(e) =>
               setNewRate({ ...newRate, hourlyDiscount: e.target.value })
             }
-          />
-
-          <InputComplete
-            id="duration"
-            label="Durée (optionnel)"
-            placeholder="ex: 1 month"
-            variant="full"
-            value={newRate.duration}
-            onChange={(e) => setNewRate({ ...newRate, duration: e.target.value })}
           />
 
           <div className="flex justify-end gap-4 mt-4">
@@ -206,7 +195,11 @@ export default function ManageRates() {
             >
               Annuler
             </Button>
-            <Button type="submit" disabled={createMutation.isPending}>
+            <Button
+              onClick={() => {}}
+              type="submit"
+              disabled={createMutation.isPending}
+            >
               {createMutation.isPending ? "Ajout..." : "Ajouter"}
             </Button>
           </div>

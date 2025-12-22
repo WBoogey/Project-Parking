@@ -18,18 +18,53 @@ export default function ParkingDetails() {
   const { data: parking, isLoading } = useParking(id);
   const { data: user } = useUser();
 
-  const handleSubscribe = () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    navigate(`/parking/${parking?.id}/subscribe`);
-  };
+  const isOwnerOfThisParking = user && parking && user.id === parking.ownerId;
+  const isLoggedIn = !!user;
 
   if (isLoading) return <div className="p-8 text-center">Chargement...</div>;
 
   if (!parking)
     return <div className="p-8 text-center">Parking non trouvé.</div>;
+
+  const renderActionButton = () => {
+    if (isOwnerOfThisParking) {
+      return (
+        <Button
+          size="full"
+          onClick={() => navigate(`/owner/parkings/${parking.id}/rates`)}
+        >
+          Éditer les tarifs
+        </Button>
+      );
+    }
+
+    if (isLoggedIn) {
+      return (
+        <>
+          <Button
+            size="full"
+            onClick={() => navigate(`/parking/${parking.id}/subscribe`)}
+          >
+            S&apos;abonner
+          </Button>
+          <p className="text-center text-xs text-gray-400 mt-4">
+            Annulation gratuite jusqu&apos;à 24h avant
+          </p>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <p className="text-center text-tertiary text-sm mb-4">
+          Vous devez être connecté pour réserver
+        </p>
+        <Button size="full" onClick={() => navigate("/login")}>
+          Se connecter
+        </Button>
+      </>
+    );
+  };
 
   return (
     <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -88,12 +123,7 @@ export default function ParkingDetails() {
             )}
           </div>
 
-          <Button size="full" onClick={handleSubscribe}>
-            S&apos;abonner
-          </Button>
-          <p className="text-center text-xs text-gray-400 mt-4">
-            Annulation gratuite jusqu&apos;à 24h avant
-          </p>
+          {renderActionButton()}
         </div>
       </div>
     </div>
