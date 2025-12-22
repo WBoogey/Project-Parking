@@ -2,14 +2,11 @@ import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
-import TimeSlotPicker from "@/components/molecules/TimeSlotPicker";
+import TimeSlotPicker, {
+  type TimeSlot,
+} from "@/components/molecules/TimeSlotPicker";
 import { useParking } from "@/hooks/useParkings";
 import { useCreateReservation } from "@/hooks/useReservation";
-
-interface TimeSlot {
-  hour: number;
-  minute: number;
-}
 
 export default function ReserveParking() {
   const { id } = useParams();
@@ -26,6 +23,33 @@ export default function ReserveParking() {
   const minDate = useMemo(() => {
     return new Date().toISOString().split("T")[0];
   }, []);
+
+  const hourlyRate = useMemo(() => {
+    if (!parking?.rates) return null;
+    const hourly = parking.rates.find((r) => r.type === "hourly");
+    return hourly || null;
+  }, [parking?.rates]);
+
+  const calculatedPrice = useMemo(() => {
+    if (!startSlot || !endSlot || !hourlyRate) return null;
+
+    const startMinutes = startSlot.hour * 60 + startSlot.minute;
+    const endMinutes = endSlot.hour * 60 + endSlot.minute;
+    const durationHours = (endMinutes - startMinutes) / 60;
+
+    if (durationHours <= 0) return null;
+
+    const basePrice = hourlyRate.price * durationHours;
+    const discount = hourlyRate.hourlyDiscount || 0;
+    const finalPrice = basePrice * (1 - discount);
+
+    return {
+      basePrice: basePrice.toFixed(2),
+      discount: discount * 100,
+      finalPrice: finalPrice.toFixed(2),
+      durationHours: durationHours.toFixed(2),
+    };
+  }, [startSlot, endSlot, hourlyRate]);
 
   const formatTimeSlot = (slot: TimeSlot): string => {
     return `${slot.hour.toString().padStart(2, "0")}:${slot.minute.toString().padStart(2, "0")}`;
@@ -105,59 +129,123 @@ export default function ReserveParking() {
       </h1>
       <p className="text-tertiary mb-8">{parking.location}</p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-3xl border border-gray-200 flex flex-col gap-6"
-      >
-        <InputComplete
-          id="date"
-          label="Date de réservation"
-          type="date"
-          variant="full"
-          value={selectedDate}
-          onChange={handleDateChange}
-          min={minDate}
-          required
-        />
-
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-4">
-            Sélectionnez votre créneau (par tranches de 15 minutes)
-          </label>
-          <TimeSlotPicker
-            selectedStart={startSlot}
-            selectedEnd={endSlot}
-            onStartChange={setStartSlot}
-            onEndChange={setEndSlot}
-            date={selectedDate}
-            minHour={6}
-            maxHour={22}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <form
+          onSubmit={handleSubmit}
+          className="lg:col-span-2 bg-white p-8 rounded-3xl border border-gray-200 flex flex-col gap-6"
+        >
+          <InputComplete
+            id="date"
+            label="Date de réservation"
+            type="date"
+            variant="full"
+            value={selectedDate}
+            onChange={handleDateChange}
+            min={minDate}
+            required
           />
-        </div>
 
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-4">
+              Sélectionnez votre créneau
+            </label>
+            <TimeSlotPicker
+              selectedStart={startSlot}
+              selectedEnd={endSlot}
+              onStartChange={setStartSlot}
+              onEndChange={setEndSlot}
+              date={selectedDate}
+              minHour={6}
+              maxHour={22}
+            />
           </div>
-        )}
 
-        <div className="flex justify-end gap-4 mt-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate(`/parking/${id}`)}
-            type="button"
-          >
-            Annuler
-          </Button>
-          <Button
-            onClick={() => {}}
-            type="submit"
-            disabled={createMutation.isPending || !startSlot || !endSlot}
-          >
-            {createMutation.isPending ? "Réservation..." : "Confirmer"}
-          </Button>
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/parking/${id}`)}
+              type="button"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => {}}
+              type="submit"
+              disabled={createMutation.isPending || !startSlot || !endSlot}
+            >
+              {createMutation.isPending ? "Réservation..." : "Confirmer"}
+            </Button>
+          </div>
+        </form>
+
+        <div className="bg-white p-6 rounded-3xl border border-gray-200 h-fit sticky top-8">
+          <h3 className="text-lg font-bold text-secondary mb-4">Récapitulatif</h3>
+
+          {hourlyRate ? (
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Tarif horaire</span>
+                <span className="font-medium">{hourlyRate.price}€/h</span>
+              </div>
+
+              {calculatedPrice ? (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Durée</span>
+                    <span className="font-medium">
+                      {calculatedPrice.durationHours}h
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Sous-total</span>
+                    <span className="font-medium">
+                      {calculatedPrice.basePrice}€
+                    </span>
+                  </div>
+
+                  {calculatedPrice.discount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Réduction ({calculatedPrice.discount}%)</span>
+                      <span>
+                        -
+                        {(
+                          parseFloat(calculatedPrice.basePrice) -
+                          parseFloat(calculatedPrice.finalPrice)
+                        ).toFixed(2)}
+                        €
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <div className="flex justify-between">
+                      <span className="font-bold text-secondary">Total</span>
+                      <span className="font-bold text-secondary text-xl">
+                        {calculatedPrice.finalPrice}€
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-gray-400 text-sm italic">
+                  Sélectionnez un créneau pour voir le prix
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm italic">
+              Aucun tarif horaire configuré
+            </p>
+          )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }
