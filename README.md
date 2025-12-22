@@ -186,7 +186,7 @@ Créer un fichier `.env` à la racine du projet avec les variables suivantes :
 
 ### Paiements
 
-- Paiement sécurisé via Stripe
+- Paiement sécurisé via Stripe : Une carte de test est nécessaire pour utiliser le mode Sandbox. Exemple : 4242 4242 4242 4242, EXP 12/34, CY 567
 - Historique des transactions
 - Webhooks pour confirmation automatique
 
