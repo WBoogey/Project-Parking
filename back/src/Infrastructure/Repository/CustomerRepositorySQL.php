@@ -9,12 +9,12 @@ use App\Domain\Parking\ParkingId;
 use App\Domain\Rate\RateId;
 use App\Domain\Reservation\Reservation;
 use App\Domain\Reservation\ReservationId;
+use App\Domain\Reservation\ReservationStatus;
 use App\Domain\Subscription\Subscription;
 use App\Domain\Subscription\SubscriptionId;
 use App\Domain\Stationing\Stationing;
 use App\Domain\Stationing\StationingId;
 use App\Domain\Stationing\StationingStatus;
-use App\Domain\TimeInterval\TimeInterval;
 use PDO;
 
 class CustomerRepositorySQL implements CustomerRepositoryInterface
@@ -42,7 +42,7 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
 
   public function getReservations(UserId $customerId): array
   {
-    $sql = "SELECT id, day_of_week, start_hour, end_hour, user_id, parking_id
+    $sql = "SELECT id, user_id, parking_id, start_time, end_time, status, rate_id, amount, is_free
             FROM reservations
             WHERE user_id = :user_id";
     $stmt = $this->connection->prepare($sql);
@@ -51,13 +51,14 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
 
     return array_map(
       fn(array $data) => Reservation::create(
-        interval: new TimeInterval(
-          $data["day_of_week"],
-          $data["start_hour"],
-          $data["end_hour"],
-        ),
-        parkingId: ParkingId::fromString($data["parking_id"]),
         userId: UserId::fromString($data["user_id"]),
+        parkingId: ParkingId::fromString($data["parking_id"]),
+        startTime: new \DateTime($data["start_time"]),
+        endTime: new \DateTime($data["end_time"]),
+        status: ReservationStatus::from($data["status"]),
+        rateId: $data["rate_id"] ? RateId::fromString($data["rate_id"]) : null,
+        amount: $data["amount"] ? (int) $data["amount"] : null,
+        isFree: (bool) $data["is_free"],
         id: ReservationId::fromString($data["id"]),
       ),
       $results,
@@ -99,7 +100,7 @@ class CustomerRepositorySQL implements CustomerRepositoryInterface
     return array_map(
       fn(array $data) => Stationing::create(
         startTime: new \DateTime($data["start_time"]),
-        endTime: new \DateTime($data["end_time"]),
+        endTime: $data["end_time"] ? new \DateTime($data["end_time"]) : null,
         status: StationingStatus::from($data["status"]),
         userId: UserId::fromString($data["user_id"]),
         parkingId: ParkingId::fromString($data["parking_id"]),

@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
+import TimeSlotPicker from "@/components/molecules/TimeSlotPicker";
 import { useParking } from "@/hooks/useParkings";
 import { useCreateReservation } from "@/hooks/useReservation";
+
+interface TimeSlot {
+  hour: number;
+  minute: number;
+}
 
 export default function ReserveParking() {
   const { id } = useParams();
@@ -12,17 +18,44 @@ export default function ReserveParking() {
   const createMutation = useCreateReservation();
 
   const today = new Date().toISOString().split("T")[0];
-  const [startDate, setStartDate] = useState(today);
-  const [startTime, setStartTime] = useState("09:00");
-  const [endDate, setEndDate] = useState(today);
-  const [endTime, setEndTime] = useState("18:00");
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [startSlot, setStartSlot] = useState<TimeSlot | null>(null);
+  const [endSlot, setEndSlot] = useState<TimeSlot | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const minDate = useMemo(() => {
+    return new Date().toISOString().split("T")[0];
+  }, []);
+
+  const formatTimeSlot = (slot: TimeSlot): string => {
+    return `${slot.hour.toString().padStart(2, "0")}:${slot.minute.toString().padStart(2, "0")}`;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id) return;
+    setError(null);
 
-    const startDateTime = `${startDate}T${startTime}:00`;
-    const endDateTime = `${endDate}T${endTime}:00`;
+    if (!id || !startSlot || !endSlot) {
+      setError("Veuillez sélectionner un créneau horaire.");
+      return;
+    }
+
+    const startDateTime = `${selectedDate}T${formatTimeSlot(startSlot)}:00`;
+    const endDateTime = `${selectedDate}T${formatTimeSlot(endSlot)}:00`;
+
+    const startDate = new Date(startDateTime);
+    const endDate = new Date(endDateTime);
+    const now = new Date();
+
+    if (startDate < now) {
+      setError("La date et heure de début ne peuvent pas être dans le passé.");
+      return;
+    }
+
+    if (endDate <= startDate) {
+      setError("L'heure de fin doit être après l'heure de début.");
+      return;
+    }
 
     createMutation.mutate(
       {
@@ -38,8 +71,23 @@ export default function ReserveParking() {
             navigate("/customer");
           }
         },
+        onError: (err) => {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Une erreur est survenue. Veuillez réessayer.",
+          );
+        },
       },
     );
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    if (newDate < minDate) return;
+    setSelectedDate(newDate);
+    setStartSlot(null);
+    setEndSlot(null);
   };
 
   if (parkingLoading) {
@@ -51,7 +99,7 @@ export default function ReserveParking() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-secondary mb-2">
         Réserver une place
       </h1>
@@ -61,47 +109,37 @@ export default function ReserveParking() {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-3xl border border-gray-200 flex flex-col gap-6"
       >
-        <div className="grid grid-cols-2 gap-4">
-          <InputComplete
-            id="startDate"
-            label="Date de début"
-            type="date"
-            variant="full"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
-          <InputComplete
-            id="startTime"
-            label="Heure de début"
-            type="time"
-            variant="full"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            required
+        <InputComplete
+          id="date"
+          label="Date de réservation"
+          type="date"
+          variant="full"
+          value={selectedDate}
+          onChange={handleDateChange}
+          min={minDate}
+          required
+        />
+
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-4">
+            Sélectionnez votre créneau (par tranches de 15 minutes)
+          </label>
+          <TimeSlotPicker
+            selectedStart={startSlot}
+            selectedEnd={endSlot}
+            onStartChange={setStartSlot}
+            onEndChange={setEndSlot}
+            date={selectedDate}
+            minHour={6}
+            maxHour={22}
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <InputComplete
-            id="endDate"
-            label="Date de fin"
-            type="date"
-            variant="full"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-          />
-          <InputComplete
-            id="endTime"
-            label="Heure de fin"
-            type="time"
-            variant="full"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-            required
-          />
-        </div>
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
 
         <div className="flex justify-end gap-4 mt-4">
           <Button
@@ -114,19 +152,12 @@ export default function ReserveParking() {
           <Button
             onClick={() => {}}
             type="submit"
-            disabled={createMutation.isPending}
+            disabled={createMutation.isPending || !startSlot || !endSlot}
           >
-            {createMutation.isPending ? "Réservation..." : "Confirmer la réservation"}
+            {createMutation.isPending ? "Réservation..." : "Confirmer"}
           </Button>
         </div>
-
-        {createMutation.isError && (
-          <p className="text-red-500 text-sm">
-            Une erreur est survenue. Veuillez réessayer.
-          </p>
-        )}
       </form>
     </div>
   );
 }
-

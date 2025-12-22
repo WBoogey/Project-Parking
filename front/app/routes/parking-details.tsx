@@ -49,7 +49,6 @@ export default function ParkingDetails() {
           </Button>
           <Button
             size="full"
-            variant="outline"
             onClick={() => navigate(`/parking/${parking.id}/subscribe`)}
           >
             S&apos;abonner
