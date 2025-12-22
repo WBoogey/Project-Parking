@@ -21,9 +21,12 @@
     "axios": "^1.13.2",
     "cn-utility": "^1.0.1",
     "isbot": "^5.1.31",
+    "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router": "^7.9.2"
+    "react-leaflet": "^5.0.0",
+    "react-router": "^7.9.2",
+    "sonner": "^2.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
@@ -32,6 +35,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^22",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

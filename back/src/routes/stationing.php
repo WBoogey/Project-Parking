@@ -26,9 +26,9 @@ if (!empty($stripeSecretKey)) {
   $paymentGateway = new StripePaymentAdapter(
     secretKey: $stripeSecretKey,
     defaultSuccessUrl: $config->get("stripe.success_url") ??
-      "http://localhost:3000/stationing/success",
+      "http://localhost:5173/stationing/success",
     defaultCancelUrl: $config->get("stripe.cancel_url") ??
-      "http://localhost:3000/stationing/cancel",
+      "http://localhost:5173/stationing/cancel",
   );
 }
 

@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
+import { SkeletonParkingDetails } from "@/components/atoms/Skeleton";
+import ParkingMapClient from "@/components/molecules/ParkingMapClient";
 import { useParking } from "@/hooks/useParkings";
 import { useUser } from "@/hooks/useUser";
 import type { RateType } from "@/types/OwnerTypes";
@@ -21,7 +23,7 @@ export default function ParkingDetails() {
   const isOwnerOfThisParking = user && parking && user.id === parking.ownerId;
   const isLoggedIn = !!user;
 
-  if (isLoading) return <div className="p-8 text-center">Chargement...</div>;
+  if (isLoading) return <SkeletonParkingDetails />;
 
   if (!parking)
     return <div className="p-8 text-center">Parking non trouvé.</div>;
@@ -82,11 +84,7 @@ export default function ParkingDetails() {
           <p className="text-tertiary">{parking.location}</p>
         </div>
 
-        <div className="bg-gray-200 h-64 rounded-3xl w-full">
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            Image / Carte
-          </div>
-        </div>
+        <ParkingMapClient address={parking.location} className="h-64 w-full" />
 
         <div>
           <h2 className="text-xl font-bold text-secondary mb-4">

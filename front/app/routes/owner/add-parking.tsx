@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
+import AddressInput from "@/components/molecules/AddressInput";
 import { useAddParking } from "@/hooks/useOwner";
 import React from "react";
 
@@ -32,13 +33,12 @@ export default function AddParking() {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-3xl border border-gray-200 flex flex-col gap-6"
       >
-        <InputComplete
+        <AddressInput
           id="location"
           label="Adresse du parking"
           placeholder="ex: 12 Rue de la Paix, 75000 Paris"
-          variant="full"
           value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={setLocation}
           required
         />
 

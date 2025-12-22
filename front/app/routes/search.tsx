@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
 import ParkingCard from "@/components/organisms/ParkingCard";
+import { SkeletonCard } from "@/components/atoms/Skeleton";
+import EmptyState from "@/components/atoms/EmptyState";
 import { useParkings } from "@/hooks/useParkings";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -46,13 +48,28 @@ export default function Search() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Chargement des parkings...</div>
+        <div className="grid gap-4">
+          {[0, 1, 2].map((i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
       ) : (
         <div className="grid gap-4">
-          {parkings?.map((parking) => (
+          {parkings?.map((parking, index) => (
             <div
               key={parking.id}
-              className="cursor-pointer"
+              className={`cursor-pointer animate-fade-in-up ${
+                index === 0
+                  ? ""
+                  : index === 1
+                    ? "animation-delay-100"
+                    : index === 2
+                      ? "animation-delay-200"
+                      : index === 3
+                        ? "animation-delay-300"
+                        : "animation-delay-400"
+              }`}
+              style={{ opacity: 0 }}
               onClick={() => navigate(`/parking/${parking.id}`)}
             >
               <ParkingCard
@@ -66,9 +83,11 @@ export default function Search() {
             </div>
           ))}
           {parkings?.length === 0 && (
-            <div className="text-center py-8 text-tertiary">
-              Aucun parking trouvé pour cette recherche.
-            </div>
+            <EmptyState
+              icon="🔍"
+              title="Aucun résultat"
+              description="Aucun parking ne correspond à votre recherche."
+            />
           )}
         </div>
       )}

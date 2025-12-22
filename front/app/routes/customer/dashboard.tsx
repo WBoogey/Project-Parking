@@ -1,12 +1,18 @@
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import Button from "@/components/atoms/Button";
+import { SkeletonCard } from "@/components/atoms/Skeleton";
+import EmptyState from "@/components/atoms/EmptyState";
 import {
   useCustomerReservations,
   useCustomerSubscriptions,
   useCustomerStationings,
 } from "@/hooks/useCustomer";
 import { useCancelSubscription } from "@/hooks/useSubscription";
-import { useCancelReservation, useGenerateInvoice } from "@/hooks/useReservation";
+import {
+  useCancelReservation,
+  useGenerateInvoice,
+} from "@/hooks/useReservation";
 import { useEnterParking, useExitParking } from "@/hooks/useStationing";
 import { useParkings } from "@/hooks/useParkings";
 import SubscriptionCard from "@/components/molecules/SubscriptionCard";
@@ -128,17 +134,25 @@ export default function CustomerDashboard() {
   };
 
   const handleCancelReservation = (id: string) => {
-    if (confirm("Voulez-vous vraiment annuler cette réservation ?")) {
-      cancelResMutation.mutate(id);
-    }
+    cancelResMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Réservation annulée");
+      },
+      onError: () => {
+        toast.error("Erreur lors de l'annulation");
+      },
+    });
   };
 
   const handleGenerateInvoice = (id: string) => {
     invoiceMutation.mutate(id, {
       onSuccess: (invoice) => {
-        alert(
-          `Facture générée : ${invoice.invoiceNumber}\nMontant : ${invoice.formattedAmount}`,
-        );
+        toast.success(`Facture ${invoice.invoiceNumber} générée`, {
+          description: `Montant : ${invoice.formattedAmount}`,
+        });
+      },
+      onError: () => {
+        toast.error("Erreur lors de la génération de la facture");
       },
     });
   };
@@ -183,8 +197,13 @@ export default function CustomerDashboard() {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 flex items-center justify-center py-12">
-        <p className="text-secondary">Chargement...</p>
+      <div className="flex flex-col gap-8">
+        <div className="h-8 w-48 bg-gray-200 rounded-xl animate-pulse" />
+        <div className="grid gap-4">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       </div>
     );
   }
@@ -198,7 +217,8 @@ export default function CustomerDashboard() {
       {hasErrors && (
         <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl">
           <p className="text-red-600">
-            Certaines données n'ont pas pu être chargées. Veuillez réessayer.
+            Certaines données n&apos;ont pas pu être chargées. Veuillez
+            réessayer.
           </p>
         </div>
       )}
@@ -208,10 +228,10 @@ export default function CustomerDashboard() {
           <section
             className={`p-8 rounded-3xl text-white ${
               overtimeInfo?.isOvertime
-                ? "bg-gradient-to-r from-red-500 to-red-600"
+                ? "bg-linear-to-r from-red-500 to-red-600"
                 : overtimeInfo?.isWarning
-                  ? "bg-gradient-to-r from-orange-500 to-orange-600"
-                  : "bg-gradient-to-r from-green-500 to-green-600"
+                  ? "bg-linear-to-r from-orange-500 to-orange-600"
+                  : "bg-linear-to-r from-green-500 to-green-600"
             }`}
           >
             <h2 className="text-xl font-bold mb-4">Stationnement en cours</h2>
@@ -219,9 +239,7 @@ export default function CustomerDashboard() {
             {overtimeInfo && (
               <div
                 className={`p-4 rounded-2xl mb-4 flex items-center gap-3 ${
-                  overtimeInfo.isOvertime
-                    ? "bg-white/30"
-                    : "bg-white/20"
+                  overtimeInfo.isOvertime ? "bg-white/30" : "bg-white/20"
                 }`}
               >
                 <span className="text-2xl">
@@ -256,7 +274,9 @@ export default function CustomerDashboard() {
               }`}
               disabled={exitMutation.isPending}
             >
-              {exitMutation.isPending ? "Sortie en cours..." : "SORTIR DU PARKING"}
+              {exitMutation.isPending
+                ? "Sortie en cours..."
+                : "SORTIR DU PARKING"}
             </Button>
           </section>
         )}
@@ -327,7 +347,9 @@ export default function CustomerDashboard() {
                   <div className="flex flex-wrap gap-2">
                     {canEnter && !isCurrentlyParkedHere && (
                       <Button
-                        onClick={() => handleEnterFromReservation(res.parkingId)}
+                        onClick={() =>
+                          handleEnterFromReservation(res.parkingId)
+                        }
                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
                         disabled={enterMutation.isPending}
                       >
@@ -375,12 +397,16 @@ export default function CustomerDashboard() {
             })}
 
             {(!reservations || reservations.length === 0) && (
-              <div className="text-center py-8">
-                <p className="text-tertiary mb-4">Aucune réservation.</p>
-                <Button onClick={() => navigate("/search")} variant="outline">
-                  Rechercher un parking
-                </Button>
-              </div>
+              <EmptyState
+                icon="🅿️"
+                title="Aucune réservation"
+                description="Vous n'avez pas encore de réservation."
+                action={
+                  <Button onClick={() => navigate("/search")} variant="outline">
+                    Rechercher un parking
+                  </Button>
+                }
+              />
             )}
           </div>
         </section>
@@ -400,7 +426,11 @@ export default function CustomerDashboard() {
               />
             ))}
             {(!subscriptions || subscriptions.length === 0) && (
-              <p className="text-tertiary italic">Aucun abonnement.</p>
+              <EmptyState
+                icon="📋"
+                title="Aucun abonnement"
+                description="Abonnez-vous pour profiter de tarifs avantageux."
+              />
             )}
           </div>
         </section>
@@ -411,7 +441,9 @@ export default function CustomerDashboard() {
           </h2>
           <div className="grid gap-4">
             {stationings
-              ?.filter((s) => s.status !== "in_progress" && s.status !== "active")
+              ?.filter(
+                (s) => s.status !== "in_progress" && s.status !== "active",
+              )
               .map((stat) => (
                 <div
                   key={stat.id}
@@ -438,7 +470,11 @@ export default function CustomerDashboard() {
             {stationings?.filter(
               (s) => s.status !== "in_progress" && s.status !== "active",
             ).length === 0 && (
-              <p className="text-tertiary italic">Aucun stationnement passé.</p>
+              <EmptyState
+                icon="🚗"
+                title="Aucun stationnement passé"
+                description="Votre historique de stationnement apparaîtra ici."
+              />
             )}
           </div>
         </section>

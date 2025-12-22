@@ -51,7 +51,7 @@ class ExitParking
     }
 
     $endTime = new DateTime();
-    
+
     // Check if user has active subscription for this parking
     $isFree = $this->hasActiveSubscription($userId, $parkingId);
 
@@ -92,13 +92,13 @@ class ExitParking
         'user_id' => $userId->toString(),
         'duration_minutes' => $durationMinutes,
       ],
-      successUrl: 'http://localhost:3000/stationing/success?session_id={CHECKOUT_SESSION_ID}',
-      cancelUrl: 'http://localhost:3000/stationing/cancel',
+      successUrl: 'http://localhost:5173/stationing/success?session_id={CHECKOUT_SESSION_ID}',
+      cancelUrl: 'http://localhost:5173/stationing/cancel',
     ));
 
     // Update stationing with exit info and payment pending status
     $updatedStationing = $stationing->exit($endTime, $hourlyRate?->getId(), $amount, false);
-    
+
     // Save with payment info
     $this->stationingRepository->saveWithPayment(
       $updatedStationing,
@@ -120,7 +120,7 @@ class ExitParking
   private function hasActiveSubscription(UserId $userId, ParkingId $parkingId): bool
   {
     $subscriptions = $this->subscriptionRepository->findByUserId($userId);
-    
+
     $today = new DateTime();
     $todayStr = $today->format('Y-m-d');
     $dayOfWeek = strtolower($today->format('l')); // monday, tuesday, etc.
@@ -172,7 +172,7 @@ class ExitParking
   private function calculatePrice(ParkingId $parkingId, DateTime $startTime, DateTime $endTime): int
   {
     $hourlyRate = $this->getHourlyRate($parkingId);
-    
+
     if ($hourlyRate === null) {
       // Default to 3€/hour if no hourly rate defined
       $pricePerHour = 3.00;
@@ -196,7 +196,7 @@ class ExitParking
   private function getHourlyRate(ParkingId $parkingId): ?\App\Domain\Rate\Rate
   {
     $rates = $this->rateRepository->findByParkingId($parkingId);
-    
+
     foreach ($rates as $rate) {
       if ($rate->getType() === RateType::HOURLY) {
         return $rate;
