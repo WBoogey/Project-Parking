@@ -1,0 +1,46 @@
+meta {
+  name: Enter Parking
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/stationings/enter
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "parkingId": "{{parkingId}}"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+  if (res.body.data && res.body.data.id) {
+    bru.setVar("stationingId", res.body.data.id);
+  }
+}
+
+tests {
+  test("should return 201 on successful entry", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return stationing data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("userId");
+    expect(res.body.data).to.have.property("parkingId");
+    expect(res.body.data).to.have.property("startTime");
+    expect(res.body.data.status).to.equal("active");
+  });
+}

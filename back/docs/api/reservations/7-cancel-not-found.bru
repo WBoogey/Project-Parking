@@ -1,0 +1,29 @@
+meta {
+  name: Cancel Reservation Not Found
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/reservations/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 404 for non-existent reservation", function() {
+    expect(res.status).to.equal(404);
+  });
+
+  test("should have error title", function() {
+    expect(res.body.title).to.equal("Not Found");
+  });
+}

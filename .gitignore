@@ -1,4 +1,6 @@
 /vendor/
+back/vendor/
+*.lock
 node_modules/
 npm-debug.log
 yarn-error.log
@@ -18,7 +20,8 @@ public_html/hot
 storage/*.key
 .env
 Homestead.yaml
-Homestead.json
+Homestead.jsongit rm --cached -r vendor/
+git rm --cached -r back/vendor/
 /.vagrant
 .phpunit.result.cache
 

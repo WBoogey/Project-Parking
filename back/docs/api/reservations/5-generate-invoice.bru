@@ -1,0 +1,47 @@
+meta {
+  name: Generate Invoice
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/reservations/{{reservationId}}/invoice
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+script:post-response {
+  console.log("response", res.body);
+  if (res.body.data && res.body.data.id) {
+    bru.setVar("invoiceId", res.body.data.id);
+  }
+}
+
+tests {
+  test("should return 201 on successful invoice generation", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return invoice data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("invoiceNumber");
+    expect(res.body.data).to.have.property("type");
+    expect(res.body.data).to.have.property("amount");
+    expect(res.body.data).to.have.property("formattedAmount");
+    expect(res.body.data).to.have.property("status");
+    expect(res.body.data).to.have.property("description");
+    expect(res.body.data).to.have.property("issuedAt");
+  });
+
+  test("invoice type should be reservation", function() {
+    expect(res.body.data.type).to.equal("reservation");
+  });
+}

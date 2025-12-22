@@ -1,0 +1,39 @@
+meta {
+  name: Get Subscription by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/subscriptions/{{subscriptionId}}
+  body: none
+  auth: none
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 when authenticated", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return subscription data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("userId");
+    expect(res.body.data).to.have.property("parkingId");
+    expect(res.body.data).to.have.property("rateId");
+    expect(res.body.data).to.have.property("startDate");
+    expect(res.body.data).to.have.property("endDate");
+    expect(res.body.data).to.have.property("weeklySlots");
+  });
+
+  test("should have correct message", function() {
+    expect(res.body.message).to.equal("Subscription details");
+  });
+}

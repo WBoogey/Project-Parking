@@ -1,0 +1,57 @@
+meta {
+  name: 2. List Rates
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/owner/parkings/{{parkingId}}/rates
+  body: none
+  auth: none
+}
+
+script:post-response {
+  console.log("response", res.body);
+
+  // Store first rate ID for update/delete tests
+  if (res.body.data && res.body.data.length > 0) {
+    bru.setEnvVar("rateId", res.body.data[0].id);
+  }
+}
+
+tests {
+  test("should return 200 when authenticated as owner", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return rates array", function() {
+    expect(res.body.data).to.be.an("array");
+  });
+
+  test("should have correct message", function() {
+    expect(res.body.message).to.equal("Rates retrieved successfully");
+  });
+
+  test("each rate should have required fields", function() {
+    if (res.body.data.length > 0) {
+      const rate = res.body.data[0];
+      expect(rate).to.have.property("id");
+      expect(rate).to.have.property("parkingId");
+      expect(rate).to.have.property("type");
+      expect(rate).to.have.property("price");
+      expect(rate).to.have.property("calculationRule");
+    }
+  });
+
+  test("rate type should be valid enum value", function() {
+    if (res.body.data.length > 0) {
+      const validTypes = ["hourly", "daily", "weekly_subscription", "monthly_subscription", "yearly_subscription"];
+      const rate = res.body.data[0];
+      expect(validTypes).to.include(rate.type);
+    }
+  });
+}

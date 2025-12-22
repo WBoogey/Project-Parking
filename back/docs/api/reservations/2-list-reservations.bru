@@ -1,0 +1,33 @@
+meta {
+  name: List Reservations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/reservations
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return array of reservations", function() {
+    expect(res.body.data).to.be.an("array");
+  });
+}
