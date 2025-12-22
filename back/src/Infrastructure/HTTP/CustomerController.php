@@ -19,11 +19,14 @@ class CustomerController extends Controllers
 
         $data = array_map(fn($reservation) => [
             'id' => $reservation->getId()->toString(),
-            'dayOfWeek' => $reservation->getInterval()->getDayOfWeek(),
-            'startHour' => $reservation->getInterval()->getStartHour(),
-            'endHour' => $reservation->getInterval()->getEndHour(),
+            'startTime' => $reservation->getStartTime()->format('Y-m-d H:i:s'),
+            'endTime' => $reservation->getEndTime()->format('Y-m-d H:i:s'),
+            'status' => $reservation->getStatus()->value,
             'parkingId' => $reservation->getParkingId()->toString(),
             'userId' => $reservation->getUserId()->toString(),
+            'rateId' => $reservation->getRateId()?->toString(),
+            'amount' => $reservation->getAmount(),
+            'isFree' => $reservation->isFree(),
         ], $reservations);
 
         return $this->success(data: $data, message: 'Customer reservations');
@@ -57,7 +60,7 @@ class CustomerController extends Controllers
         $data = array_map(fn($stationing) => [
             'id' => $stationing->getId()->toString(),
             'startTime' => $stationing->getStartTime()->format('Y-m-d H:i:s'),
-            'endTime' => $stationing->getEndTime()->format('Y-m-d H:i:s'),
+            'endTime' => $stationing->getEndTime()?->format('Y-m-d H:i:s'),
             'status' => $stationing->getStatus()->value,
             'parkingId' => $stationing->getParkingId()->toString(),
             'userId' => $stationing->getUserId()->toString(),

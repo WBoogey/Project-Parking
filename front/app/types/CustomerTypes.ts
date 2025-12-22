@@ -1,9 +1,13 @@
 export interface Reservation {
   id: string;
-  dayOfWeek: string;
-  startHour: string;
-  endHour: string;
+  startTime: string;
+  endTime: string;
+  status: string;
   parkingId: string;
+  userId: string;
+  rateId: string | null;
+  amount: number | null;
+  isFree: boolean;
 }
 
 export interface Subscription {
@@ -21,7 +25,8 @@ export interface Subscription {
 export interface Stationing {
   id: string;
   startTime: string;
-  endTime: string;
+  endTime: string | null;
   status: string;
   parkingId: string;
+  userId: string;
 }

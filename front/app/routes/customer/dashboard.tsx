@@ -6,11 +6,7 @@ import {
   useCustomerStationings,
 } from "@/hooks/useCustomer";
 import { useCancelSubscription } from "@/hooks/useSubscription";
-import {
-  useReservations,
-  useCancelReservation,
-  useGenerateInvoice,
-} from "@/hooks/useReservation";
+import { useCancelReservation, useGenerateInvoice } from "@/hooks/useReservation";
 import { useEnterParking, useExitParking } from "@/hooks/useStationing";
 import { useParkings } from "@/hooks/useParkings";
 import SubscriptionCard from "@/components/molecules/SubscriptionCard";
@@ -18,13 +14,21 @@ import type { SubscriptionDetail } from "@/types/SubscriptionTypes";
 
 export default function CustomerDashboard() {
   const navigate = useNavigate();
-  const { data: legacyReservations, isLoading: isLoadingLegacyRes, error: legacyError } =
-    useCustomerReservations();
-  const { data: reservations, isLoading: isLoadingRes, error: resError } = useReservations();
-  const { data: subscriptions, isLoading: isLoadingSub, error: subError } =
-    useCustomerSubscriptions();
-  const { data: stationings, isLoading: isLoadingStat, error: statError } =
-    useCustomerStationings();
+  const {
+    data: reservations,
+    isLoading: isLoadingRes,
+    error: resError,
+  } = useCustomerReservations();
+  const {
+    data: subscriptions,
+    isLoading: isLoadingSub,
+    error: subError,
+  } = useCustomerSubscriptions();
+  const {
+    data: stationings,
+    isLoading: isLoadingStat,
+    error: statError,
+  } = useCustomerStationings();
   const { data: parkings } = useParkings();
 
   const cancelSubMutation = useCancelSubscription();
@@ -33,8 +37,7 @@ export default function CustomerDashboard() {
   const enterMutation = useEnterParking();
   const exitMutation = useExitParking();
 
-  const isLoading =
-    isLoadingLegacyRes || isLoadingRes || isLoadingSub || isLoadingStat;
+  const isLoading = isLoadingRes || isLoadingSub || isLoadingStat;
 
   const activeStationing = stationings?.find(
     (s) => s.status === "in_progress" || s.status === "active",
@@ -53,7 +56,6 @@ export default function CustomerDashboard() {
   };
 
   const canEnterReservation = (
-    reservationId: string,
     parkingId: string,
     startTime: string,
     status: string,
@@ -142,7 +144,7 @@ export default function CustomerDashboard() {
     );
   }
 
-  const hasErrors = legacyError || resError || subError || statError;
+  const hasErrors = resError || subError || statError;
 
   return (
     <>
@@ -187,7 +189,6 @@ export default function CustomerDashboard() {
             {reservations?.map((res) => {
               const isActive = isReservationActive(res.startTime, res.endTime);
               const canEnter = canEnterReservation(
-                res.id,
                 res.parkingId,
                 res.startTime,
                 res.status,
@@ -292,34 +293,14 @@ export default function CustomerDashboard() {
               );
             })}
 
-            {legacyReservations?.map((res) => (
-              <div
-                key={res.id}
-                className="bg-white p-6 rounded-2xl border border-tertiary/20 flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-bold text-secondary">
-                    {getParkingName(res.parkingId)}
-                  </p>
-                  <p className="text-tertiary">
-                    {res.dayOfWeek} • {res.startHour} - {res.endHour}
-                  </p>
-                </div>
-                <div className="px-4 py-2 bg-green-100 text-green-700 rounded-xl text-sm font-medium">
-                  Confirmé
-                </div>
+            {(!reservations || reservations.length === 0) && (
+              <div className="text-center py-8">
+                <p className="text-tertiary mb-4">Aucune réservation.</p>
+                <Button onClick={() => navigate("/search")} variant="outline">
+                  Rechercher un parking
+                </Button>
               </div>
-            ))}
-
-            {(!reservations || reservations.length === 0) &&
-              (!legacyReservations || legacyReservations.length === 0) && (
-                <div className="text-center py-8">
-                  <p className="text-tertiary mb-4">Aucune réservation.</p>
-                  <Button onClick={() => navigate("/search")} variant="outline">
-                    Rechercher un parking
-                  </Button>
-                </div>
-              )}
+            )}
           </div>
         </section>
 
