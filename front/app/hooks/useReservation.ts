@@ -1,24 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   reservationApi,
   type CreateReservationData,
 } from "@/api/reservationApi";
 import { queryKeys } from "@/api/queryKeyFactory";
-
-export const useReservations = () => {
-  return useQuery({
-    queryKey: queryKeys.reservation.list(),
-    queryFn: reservationApi.getReservations,
-  });
-};
-
-export const useReservation = (id: string) => {
-  return useQuery({
-    queryKey: queryKeys.reservation.detail(id),
-    queryFn: () => reservationApi.getReservation(id),
-    enabled: !!id,
-  });
-};
 
 export const useCreateReservation = () => {
   const queryClient = useQueryClient();

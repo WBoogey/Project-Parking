@@ -2,7 +2,12 @@ import { useState, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
-import { useOwnerRates, useCreateRate, useDeleteRate } from "@/hooks/useOwner";
+import {
+  useOwnerRates,
+  useCreateRate,
+  useDeleteRate,
+  useUpdateRate,
+} from "@/hooks/useOwner";
 import type { RateType } from "@/types/OwnerTypes";
 
 const RATE_TYPE_OPTIONS: { value: RateType; label: string }[] = [
@@ -36,14 +41,26 @@ export default function ManageRates() {
 
   const { data: rates, isLoading } = useOwnerRates(parkingId);
   const createMutation = useCreateRate(parkingId);
+  const updateMutation = useUpdateRate(parkingId);
   const deleteMutation = useDeleteRate(parkingId);
 
   const [showForm, setShowForm] = useState(false);
+  const [editingRateId, setEditingRateId] = useState<string | null>(null);
   const [newRate, setNewRate] = useState({
     type: "hourly" as RateType,
     price: "",
     hourlyDiscount: "",
   });
+
+  const resetForm = () => {
+    setShowForm(false);
+    setEditingRateId(null);
+    setNewRate({
+      type: "hourly",
+      price: "",
+      hourlyDiscount: "",
+    });
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -55,24 +72,39 @@ export default function ManageRates() {
     const discountDecimal =
       discountPercent !== undefined ? discountPercent / 100 : undefined;
 
-    createMutation.mutate(
-      {
-        type: newRate.type,
-        calculationRule: CALCULATION_RULES[newRate.type],
-        price: parseFloat(newRate.price),
-        hourlyDiscount: discountDecimal,
-      },
-      {
-        onSuccess: () => {
-          setShowForm(false);
-          setNewRate({
-            type: "hourly",
-            price: "",
-            hourlyDiscount: "",
-          });
-        },
-      },
-    );
+    const rateData = {
+      type: newRate.type,
+      calculationRule: CALCULATION_RULES[newRate.type],
+      price: parseFloat(newRate.price),
+      hourlyDiscount: discountDecimal,
+    };
+
+    if (editingRateId) {
+      updateMutation.mutate(
+        { rateId: editingRateId, data: rateData },
+        { onSuccess: resetForm },
+      );
+    } else {
+      createMutation.mutate(rateData, { onSuccess: resetForm });
+    }
+  };
+
+  const handleEdit = (rate: {
+    id: string;
+    type: RateType;
+    price: number;
+    hourlyDiscount: number | null;
+  }) => {
+    setEditingRateId(rate.id);
+    setNewRate({
+      type: rate.type,
+      price: rate.price.toString(),
+      hourlyDiscount:
+        rate.hourlyDiscount !== null
+          ? (rate.hourlyDiscount * 100).toString()
+          : "",
+    });
+    setShowForm(true);
   };
 
   const handleDelete = (rateId: string) => {
@@ -113,13 +145,25 @@ export default function ManageRates() {
                       ` (réduction: ${Math.round(rate.hourlyDiscount * 100)}%)`}
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => handleDelete(rate.id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  Supprimer
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleEdit(rate)}
+                    disabled={
+                      deleteMutation.isPending || updateMutation.isPending
+                    }
+                  >
+                    Modifier
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDelete(rate.id)}
+                    disabled={deleteMutation.isPending}
+                    className="text-red-500 border-red-500 hover:bg-red-50"
+                  >
+                    Supprimer
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -139,7 +183,9 @@ export default function ManageRates() {
           onSubmit={handleSubmit}
           className="mt-6 bg-white p-8 rounded-3xl border border-gray-200 flex flex-col gap-6"
         >
-          <h2 className="text-xl font-bold text-secondary">Nouveau tarif</h2>
+          <h2 className="text-xl font-bold text-secondary">
+            {editingRateId ? "Modifier le tarif" : "Nouveau tarif"}
+          </h2>
 
           <div className="flex flex-col gap-2">
             <label
@@ -188,25 +234,27 @@ export default function ManageRates() {
           />
 
           <div className="flex justify-end gap-4 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowForm(false)}
-              type="button"
-            >
+            <Button variant="outline" onClick={resetForm} type="button">
               Annuler
             </Button>
             <Button
-              onClick={() => {}}
               type="submit"
-              disabled={createMutation.isPending}
+              disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {createMutation.isPending ? "Ajout..." : "Ajouter"}
+              {editingRateId
+                ? updateMutation.isPending
+                  ? "Modification..."
+                  : "Modifier"
+                : createMutation.isPending
+                  ? "Ajout..."
+                  : "Ajouter"}
             </Button>
           </div>
 
-          {createMutation.isError && (
+          {(createMutation.isError || updateMutation.isError) && (
             <p className="text-red-500 text-sm">
-              Une erreur est survenue lors de l&apos;ajout.
+              Une erreur est survenue lors de{" "}
+              {editingRateId ? "la modification" : "l'ajout"}.
             </p>
           )}
         </form>
@@ -214,4 +262,3 @@ export default function ManageRates() {
     </div>
   );
 }
-

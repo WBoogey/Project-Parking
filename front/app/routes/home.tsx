@@ -21,17 +21,12 @@ export default function Home() {
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center">
         <Link to="/search" className="flex-1">
-          <Button onClick={() => {}} size="full" className="h-14 text-lg">
+          <Button size="full" className="h-14 text-lg">
             Trouver une place
           </Button>
         </Link>
         <Link to="/register/pro" className="flex-1">
-          <Button
-            onClick={() => {}}
-            variant="outline"
-            size="full"
-            className="h-14 text-lg"
-          >
+          <Button variant="outline" size="full" className="h-14 text-lg">
             Devenir propriétaire
           </Button>
         </Link>
@@ -47,7 +42,7 @@ export default function Home() {
           </h3>
           <p className="text-tertiary">
             Des parkings situés au cœur des villes, proches de vos points
-            d'intérêt.
+            d&apos;intérêt.
           </p>
         </div>
         <div className="p-8 rounded-3xl bg-white border border-tertiary/20">

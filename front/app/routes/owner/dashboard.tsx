@@ -43,7 +43,7 @@ export default function OwnerDashboard() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-secondary">Tableau de bord</h1>
         <Link to="/owner/parkings/add">
-          <Button onClick={() => {}}>Ajouter un parking</Button>
+          <Button>Ajouter un parking</Button>
         </Link>
       </div>
 
@@ -139,9 +139,7 @@ export default function OwnerDashboard() {
               description="Vous n'avez pas encore ajouté de parking."
               action={
                 <Link to="/owner/parkings/add">
-                  <Button onClick={() => {}} variant="outline">
-                    Ajouter mon premier parking
-                  </Button>
+                  <Button variant="outline">Ajouter mon premier parking</Button>
                 </Link>
               }
             />

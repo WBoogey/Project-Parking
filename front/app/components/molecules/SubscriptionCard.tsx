@@ -27,7 +27,6 @@ const STATUS_LABELS = {
 
 interface SubscriptionCardProps {
   subscription: SubscriptionDetail;
-  onViewDetails?: (id: string) => void;
   onCancel?: (id: string) => void;
   isLoading?: boolean;
   className?: string;
@@ -35,7 +34,6 @@ interface SubscriptionCardProps {
 
 const SubscriptionCard = ({
   subscription,
-  onViewDetails,
   onCancel,
   isLoading = false,
   className,
@@ -100,17 +98,6 @@ const SubscriptionCard = ({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
-          {onViewDetails && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onViewDetails(subscription.id)}
-              disabled={isLoading}
-            >
-              Détails
-            </Button>
-          )}
-
           {onCancel && subscription.status === "active" && !showConfirm && (
             <Button
               size="sm"

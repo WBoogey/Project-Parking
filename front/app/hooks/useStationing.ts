@@ -1,21 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { stationingApi } from "@/api/stationingApi";
 import { queryKeys } from "@/api/queryKeyFactory";
-
-export const useStationings = () => {
-  return useQuery({
-    queryKey: queryKeys.stationing.list(),
-    queryFn: stationingApi.getStationings,
-  });
-};
-
-export const useActiveStationing = (parkingId: string) => {
-  return useQuery({
-    queryKey: queryKeys.stationing.active(parkingId),
-    queryFn: () => stationingApi.getActiveStationing(parkingId),
-    enabled: !!parkingId,
-  });
-};
 
 export const useEnterParking = () => {
   const queryClient = useQueryClient();
@@ -42,4 +27,3 @@ export const useExitParking = () => {
     },
   });
 };
-

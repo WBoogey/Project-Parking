@@ -175,7 +175,6 @@ export default function ReserveParking() {
               Annuler
             </Button>
             <Button
-              onClick={() => {}}
               type="submit"
               disabled={createMutation.isPending || !startSlot || !endSlot}
             >
@@ -185,7 +184,9 @@ export default function ReserveParking() {
         </form>
 
         <div className="bg-white p-6 rounded-3xl border border-gray-200 h-fit sticky top-8">
-          <h3 className="text-lg font-bold text-secondary mb-4">Récapitulatif</h3>
+          <h3 className="text-lg font-bold text-secondary mb-4">
+            Récapitulatif
+          </h3>
 
           {hourlyRate ? (
             <div className="space-y-3">

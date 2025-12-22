@@ -46,20 +46,6 @@ export interface Invoice {
 }
 
 export const reservationApi = {
-  getReservations: async (): Promise<Reservation[]> => {
-    const response = await apiClient.get<{ data: Reservation[] }>(
-      "/reservations",
-    );
-    return response.data.data;
-  },
-
-  getReservation: async (id: string): Promise<Reservation> => {
-    const response = await apiClient.get<{ data: Reservation }>(
-      `/reservations/${id}`,
-    );
-    return response.data.data;
-  },
-
   createReservation: async (
     data: CreateReservationData,
   ): Promise<CreateReservationResponse> => {

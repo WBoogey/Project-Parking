@@ -61,7 +61,7 @@ export default function AddParking() {
           >
             Annuler
           </Button>
-          <Button onClick={() => {}} type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isPending}>
             {isPending ? "Ajout..." : "Ajouter le parking"}
           </Button>
         </div>

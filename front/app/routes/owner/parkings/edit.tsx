@@ -82,11 +82,7 @@ export default function EditParking() {
           >
             Annuler
           </Button>
-          <Button
-            onClick={() => {}}
-            type="submit"
-            disabled={updateMutation.isPending}
-          >
+          <Button type="submit" disabled={updateMutation.isPending}>
             {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
           </Button>
         </div>
@@ -100,4 +96,3 @@ export default function EditParking() {
     </div>
   );
 }
-

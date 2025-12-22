@@ -45,9 +45,7 @@ export default function CustomerDashboard() {
 
   const isLoading = isLoadingRes || isLoadingSub || isLoadingStat;
 
-  const activeStationing = stationings?.find(
-    (s) => s.status === "in_progress" || s.status === "active",
-  );
+  const activeStationing = stationings?.find((s) => s.status === "active");
 
   const getReservationForStationing = () => {
     if (!activeStationing || !reservations) return null;
@@ -155,10 +153,6 @@ export default function CustomerDashboard() {
         toast.error("Erreur lors de la génération de la facture");
       },
     });
-  };
-
-  const handleViewDetails = (id: string) => {
-    navigate(`/subscription/${id}`);
   };
 
   const handleCancelSub = (id: string) => {
@@ -420,7 +414,6 @@ export default function CustomerDashboard() {
               <SubscriptionCard
                 key={sub.id}
                 subscription={mapToSubscriptionDetail(sub)}
-                onViewDetails={handleViewDetails}
                 onCancel={handleCancelSub}
                 isLoading={cancelSubMutation.isPending}
               />
@@ -441,9 +434,7 @@ export default function CustomerDashboard() {
           </h2>
           <div className="grid gap-4">
             {stationings
-              ?.filter(
-                (s) => s.status !== "in_progress" && s.status !== "active",
-              )
+              ?.filter((s) => s.status !== "active")
               .map((stat) => (
                 <div
                   key={stat.id}
@@ -467,9 +458,7 @@ export default function CustomerDashboard() {
                   </div>
                 </div>
               ))}
-            {stationings?.filter(
-              (s) => s.status !== "in_progress" && s.status !== "active",
-            ).length === 0 && (
+            {stationings?.filter((s) => s.status !== "active").length === 0 && (
               <EmptyState
                 icon="🚗"
                 title="Aucun stationnement passé"

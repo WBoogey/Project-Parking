@@ -12,7 +12,6 @@ export default [
     route("parking/:id", "routes/parking-details.tsx"),
     route("parking/:id/reserve", "routes/parking/reserve.tsx"),
     route("parking/:id/subscribe", "routes/parking/subscribe.tsx"),
-    route("payment", "routes/payment.tsx"),
     route("payment/success", "routes/payment/success.tsx"),
     route("payment/cancel", "routes/payment/cancel.tsx"),
 

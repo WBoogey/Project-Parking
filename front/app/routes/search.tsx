@@ -41,9 +41,7 @@ export default function Search() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1"
           />
-          <Button onClick={() => {}} className="mt-1.5">
-            Rechercher
-          </Button>
+          <Button className="mt-1.5">Rechercher</Button>
         </div>
       </div>
 

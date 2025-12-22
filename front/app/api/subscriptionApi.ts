@@ -1,11 +1,9 @@
-import apiClient from "@/api/client";
 import type {
-  SubscriptionDetail,
-  CreateSubscriptionData,
   SubscriptionPriceResponse,
   SubscriptionType,
   WeeklySlot,
 } from "@/types/SubscriptionTypes";
+import apiClient from "@/api/client";
 
 const WEEKEND_SLOTS: WeeklySlot[] = [
   { dayOfWeek: 5, startHour: "18:00", endHour: "23:59" },
@@ -63,62 +61,9 @@ const BASE_MONTHLY_PRICES: Record<SubscriptionType, number> = {
 };
 
 export const subscriptionApi = {
-  getSubscriptions: async () => {
-    const response = await apiClient.get<{ data: SubscriptionDetail[] }>(
-      "/subscriptions",
-    );
-    return response.data.data;
-  },
-
-  getSubscription: async (id: string) => {
-    const response = await apiClient.get<{ data: SubscriptionDetail }>(
-      `/subscriptions/${id}`,
-    );
-    return response.data.data;
-  },
-
-  createSubscription: async (data: CreateSubscriptionData) => {
-    const weeklySlots =
-      data.weeklySlots ?? getDefaultSlotsForType(data.subscriptionType);
-    const endDate = new Date(data.startDate);
-    endDate.setMonth(endDate.getMonth() + data.durationMonths);
-
-    const payload = {
-      parkingId: data.parkingId,
-      startDate: data.startDate,
-      endDate: endDate.toISOString().split("T")[0],
-      weeklySlots,
-    };
-
-    const response = await apiClient.post("/subscriptions", payload);
-    return response.data;
-  },
-
-  subscribe: async (
-    parkingId: string,
-    data: Omit<CreateSubscriptionData, "parkingId">,
-  ) => {
-    return subscriptionApi.createSubscription({ ...data, parkingId });
-  },
-
-  updateSubscription: async (
-    id: string,
-    data: Partial<CreateSubscriptionData>,
-  ) => {
-    const response = await apiClient.put(`/subscriptions/${id}`, data);
-    return response.data;
-  },
-
   cancelSubscription: async (id: string) => {
     const response = await apiClient.delete(`/subscriptions/${id}`);
     return response.data;
-  },
-
-  getSubscriptionDetails: async (id: string) => {
-    const response = await apiClient.get<{ data: SubscriptionDetail }>(
-      `/subscriptions/${id}`,
-    );
-    return response.data.data;
   },
 
   calculatePrice: async (

@@ -86,7 +86,7 @@ const EstimationForm = ({ onSubmit }: EstimationFormProps) => {
         required
       />
 
-      <Button type="submit" size="full" onClick={() => {}}>
+      <Button type="submit" size="full">
         Obtenir une estimation
       </Button>
     </form>
@@ -94,4 +94,3 @@ const EstimationForm = ({ onSubmit }: EstimationFormProps) => {
 };
 
 export default EstimationForm;
-
