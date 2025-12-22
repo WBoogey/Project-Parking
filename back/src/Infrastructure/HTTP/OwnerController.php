@@ -1,6 +1,6 @@
 <?php
 
-namespace App\HTTP;
+namespace App\Infrastructure\HTTP;
 
 use App\Infrastructure\Core\Config\Controllers;
 use App\Infrastructure\Middleware\AuthContext;
@@ -118,6 +118,70 @@ class OwnerController extends Controllers
                 "title" => "Unprocessable Entity",
                 "detail" => "Invalid parking ID format",
                 "status" => 422,
+            ]);
+        }
+    }
+
+    #[RequireOwner]
+    public function updateParking(string $id): bool|string
+    {
+        $user = AuthContext::getUser();
+        $input = json_decode(file_get_contents("php://input"), true);
+
+        if (!$input) {
+            return $this->json(400, [
+                "type" => "https://httpstatuses.com/400",
+                "title" => "Bad Request",
+                "detail" => "Invalid JSON body",
+                "status" => 400,
+            ]);
+        }
+
+        $location = isset($input["location"]) ? $this->sanitize($input["location"]) : null;
+        $capacity = isset($input["capacity"]) ? (int) $input["capacity"] : null;
+
+        if ($location === null && $capacity === null) {
+            return $this->json(422, [
+                "type" => "https://httpstatuses.com/422",
+                "title" => "Unprocessable Entity",
+                "detail" => "At least one field must be provided: location, capacity",
+                "status" => 422,
+            ]);
+        }
+
+        if ($capacity !== null && $capacity <= 0) {
+            return $this->json(422, [
+                "type" => "https://httpstatuses.com/422",
+                "title" => "Unprocessable Entity",
+                "detail" => "Capacity must be greater than 0",
+                "status" => 422,
+            ]);
+        }
+
+        try {
+            $parking = $this->ownerService->updateParking(
+                parkingId: $id,
+                ownerId: $user->getId()->toString(),
+                location: $location,
+                capacity: $capacity,
+            );
+
+            return $this->success(
+                data: [
+                    "id" => $parking->getId()->toString(),
+                    "location" => $parking->getLocation(),
+                    "capacity" => $parking->getCapacity(),
+                    "ownerId" => $parking->getOwnerId()->toString(),
+                ],
+                message: "Parking updated successfully"
+            );
+        } catch (\InvalidArgumentException $e) {
+            $status = str_contains($e->getMessage(), 'not found') ? 404 : 403;
+            return $this->json($status, [
+                "type" => "https://httpstatuses.com/{$status}",
+                "title" => $status === 404 ? "Not Found" : "Forbidden",
+                "detail" => $e->getMessage(),
+                "status" => $status,
             ]);
         }
     }

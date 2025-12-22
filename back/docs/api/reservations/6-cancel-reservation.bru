@@ -1,0 +1,36 @@
+meta {
+  name: Cancel Reservation
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/reservations/{{reservationId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200 on successful cancellation", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return cancellation info", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("status");
+    expect(res.body.data.status).to.equal("cancelled");
+    expect(res.body.data).to.have.property("wasRefunded");
+  });
+}

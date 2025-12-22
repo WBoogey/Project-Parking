@@ -89,6 +89,8 @@ try {
   require_once __DIR__ . "/../src/routes/rate.php";
   require_once __DIR__ . "/../src/routes/parking.php";
   require_once __DIR__ . "/../src/routes/stripe.php";
+  require_once __DIR__ . "/../src/routes/stationing.php";
+  require_once __DIR__ . "/../src/routes/reservation.php";
   require_once __DIR__ . "/../src/routes/app.php";
 } catch (Throwable $e) {
   http_response_code(500);

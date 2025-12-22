@@ -1,0 +1,57 @@
+meta {
+  name: Create Reservation
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/reservations
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "parkingId": "{{parkingId}}",
+    "startTime": "2025-12-28 10:00:00",
+    "endTime": "2025-12-28 12:00:00"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+  if (res.body.data && res.body.data.id) {
+    bru.setVar("reservationId", res.body.data.id);
+  }
+}
+
+tests {
+  test("should return 201 on successful creation", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return reservation data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("userId");
+    expect(res.body.data).to.have.property("parkingId");
+    expect(res.body.data).to.have.property("startTime");
+    expect(res.body.data).to.have.property("endTime");
+    expect(res.body.data).to.have.property("status");
+    expect(res.body.data).to.have.property("amount");
+  });
+
+  test("should have payment info if not free", function() {
+    if (!res.body.data.isFree) {
+      expect(res.body.data).to.have.property("checkoutUrl");
+      expect(res.body.data).to.have.property("stripeSessionId");
+    }
+  });
+}

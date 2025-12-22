@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\HTTP\StripeWebhookController;
+use App\Infrastructure\HTTP\StripeWebhookController;
 use App\Infrastructure\Core\Config\Config;
 
 // Stripe webhook secret

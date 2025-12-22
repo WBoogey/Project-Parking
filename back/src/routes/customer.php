@@ -1,6 +1,6 @@
 <?php
 
-use App\HTTP\CustomerController;
+use App\Infrastructure\HTTP\CustomerController;
 use App\Services\CustomerService;
 use App\Domain\Customer\Application\GetCustomerReservations;
 use App\Domain\Customer\Application\GetCustomerSubscriptions;

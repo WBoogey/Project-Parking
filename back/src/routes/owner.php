@@ -1,19 +1,22 @@
 <?php
 
-use App\HTTP\OwnerController;
+use App\Infrastructure\HTTP\OwnerController;
 use App\Services\OwnerService;
 use App\Domain\Owner\Application\GetOwnerParkings;
 use App\Domain\Owner\Application\AddParkingToOwner;
 use App\Domain\Owner\Application\RemoveParkingFromOwner;
+use App\Domain\Parking\Application\UpdateParking;
 
 $getOwnerParkingsUseCase = new GetOwnerParkings($ownerRepository);
 $addParkingToOwnerUseCase = new AddParkingToOwner($ownerRepository);
 $removeParkingFromOwnerUseCase = new RemoveParkingFromOwner($ownerRepository);
+$updateParkingUseCase = new UpdateParking($parkingRepository);
 
 $ownerService = new OwnerService(
     $getOwnerParkingsUseCase,
     $addParkingToOwnerUseCase,
-    $removeParkingFromOwnerUseCase
+    $removeParkingFromOwnerUseCase,
+    $updateParkingUseCase
 );
 $ownerController = new OwnerController($ownerService);
 
@@ -33,4 +36,10 @@ $router->delete(
     "/api/owner/parkings",
     [$ownerController, "removeParking"],
     "api.owner.parkings.remove"
+);
+
+$router->put(
+    "/api/owner/parkings/:id",
+    [$ownerController, "updateParking"],
+    "api.owner.parkings.update"
 );

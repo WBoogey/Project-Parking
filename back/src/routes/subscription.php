@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\HTTP\SubscriptionController;
+use App\Infrastructure\HTTP\SubscriptionController;
 use App\Services\SubscriptionService;
 use App\Domain\Subscription\Application\CreateSubscription;
 use App\Domain\Subscription\Application\GetSubscription;

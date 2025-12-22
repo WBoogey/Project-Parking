@@ -1,0 +1,41 @@
+meta {
+  name: Get Parking By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/parkings/{{parkingId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should have success status", function() {
+    expect(res.body.status).to.equal("success");
+  });
+
+  test("should return parking data", function() {
+    expect(res.body.data).to.have.property("id");
+    expect(res.body.data).to.have.property("name");
+    expect(res.body.data).to.have.property("address");
+    expect(res.body.data).to.have.property("capacity");
+  });
+
+  test("should include rates", function() {
+    expect(res.body.data).to.have.property("rates");
+    expect(res.body.data.rates).to.be.an("array");
+  });
+}

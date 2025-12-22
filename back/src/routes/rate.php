@@ -6,7 +6,7 @@ use App\Domain\Rate\Application\CreateRate;
 use App\Domain\Rate\Application\DeleteRate;
 use App\Domain\Rate\Application\GetParkingRates;
 use App\Domain\Rate\Application\UpdateRate;
-use App\HTTP\RateController;
+use App\Infrastructure\HTTP\RateController;
 use App\Services\RateService;
 
 // Initialize use-cases
