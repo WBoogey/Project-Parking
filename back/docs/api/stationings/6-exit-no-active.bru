@@ -1,0 +1,35 @@
+meta {
+  name: Exit Parking No Active
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/stationings/exit
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "parkingId": "{{parkingId}}"
+  }
+}
+
+script:post-response {
+  console.log("response", res.body);
+}
+
+tests {
+  test("should return 404 when no active stationing", function() {
+    expect(res.status).to.equal(404);
+  });
+
+  test("should have error message", function() {
+    expect(res.body.title).to.equal("Not Found");
+  });
+}
