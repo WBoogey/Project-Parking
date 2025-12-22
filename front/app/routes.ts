@@ -10,6 +10,7 @@ export default [
     index("routes/home.tsx"),
     route("search", "routes/search.tsx"),
     route("parking/:id", "routes/parking-details.tsx"),
+    route("parking/:id/reserve", "routes/parking/reserve.tsx"),
     route("parking/:id/subscribe", "routes/parking/subscribe.tsx"),
     route("payment", "routes/payment.tsx"),
     route("payment/success", "routes/payment/success.tsx"),
@@ -17,6 +18,7 @@ export default [
 
     route("owner", "routes/owner/dashboard.tsx"),
     route("owner/parkings/add", "routes/owner/add-parking.tsx"),
+    route("owner/parkings/:id/edit", "routes/owner/parkings/edit.tsx"),
     route("owner/parkings/:id/rates", "routes/owner/parkings/rates.tsx"),
 
     route("customer", "routes/customer/dashboard.tsx"),

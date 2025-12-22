@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ownerApi } from "@/api/ownerApi";
+import { ownerApi, type UpdateParkingData } from "@/api/ownerApi";
 import { rateApi } from "@/api/rateApi";
 import { queryKeys } from "@/api/queryKeyFactory";
 import { useNavigate } from "react-router";
@@ -82,6 +82,19 @@ export const useDeleteRate = (parkingId: string) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.owner.rates(parkingId),
       });
+    },
+  });
+};
+
+export const useUpdateParking = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateParkingData }) =>
+      ownerApi.updateParking(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.owner.parkings() });
+      navigate("/owner");
     },
   });
 };

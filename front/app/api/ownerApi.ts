@@ -7,6 +7,11 @@ export interface Parking {
   ownerId: string;
 }
 
+export interface UpdateParkingData {
+  location?: string;
+  capacity?: number;
+}
+
 export const ownerApi = {
   getParkings: async () => {
     const response = await apiClient.get<{ data: Parking[] }>(
@@ -25,5 +30,13 @@ export const ownerApi = {
       data: { parkingId },
     });
     return response.data;
+  },
+
+  updateParking: async (id: string, data: UpdateParkingData) => {
+    const response = await apiClient.put<{ data: Parking }>(
+      `/owner/parkings/${id}`,
+      data,
+    );
+    return response.data.data;
   },
 };

@@ -34,17 +34,20 @@ export const parkingApi = {
   },
 
   getParkingById: async (id: string): Promise<ParkingWithRates | undefined> => {
-    const response = await apiClient.get<{ data: ApiParkingResponse[] }>(
-      "/parkings",
-    );
-    const item = response.data.data.find((p) => p.parking.id === id);
-    if (!item) return undefined;
-    return {
-      id: item.parking.id,
-      location: item.parking.location,
-      capacity: item.parking.capacity,
-      ownerId: item.parking.ownerId,
-      rates: item.rates,
-    };
+    try {
+      const response = await apiClient.get<{ data: ApiParkingResponse }>(
+        `/parkings/${id}`,
+      );
+      const item = response.data.data;
+      return {
+        id: item.parking.id,
+        location: item.parking.location,
+        capacity: item.parking.capacity,
+        ownerId: item.parking.ownerId,
+        rates: item.rates,
+      };
+    } catch {
+      return undefined;
+    }
   },
 };

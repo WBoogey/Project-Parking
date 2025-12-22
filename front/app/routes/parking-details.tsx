@@ -40,17 +40,24 @@ export default function ParkingDetails() {
 
     if (isLoggedIn) {
       return (
-        <>
+        <div className="flex flex-col gap-3">
           <Button
             size="full"
+            onClick={() => navigate(`/parking/${parking.id}/reserve`)}
+          >
+            Réserver
+          </Button>
+          <Button
+            size="full"
+            variant="outline"
             onClick={() => navigate(`/parking/${parking.id}/subscribe`)}
           >
             S&apos;abonner
           </Button>
-          <p className="text-center text-xs text-gray-400 mt-4">
+          <p className="text-center text-xs text-gray-400 mt-2">
             Annulation gratuite jusqu&apos;à 24h avant
           </p>
-        </>
+        </div>
       );
     }
 

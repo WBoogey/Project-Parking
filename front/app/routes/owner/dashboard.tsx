@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router";
-import ParkingCard from "@/components/organisms/ParkingCard";
 import Button from "@/components/atoms/Button";
 import { useDeleteParking, useOwnerParkings } from "@/hooks/useOwner";
 
@@ -51,18 +50,51 @@ export default function OwnerDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {parkings?.map((parking) => (
-          <ParkingCard
+          <div
             key={parking.id}
-            name={parking.location}
-            totalSpots={parking.capacity}
-            onEdit={() => navigate(`/owner/parkings/${parking.id}/rates`)}
-            editLabel="Gérer les tarifs"
-            onDelete={() => {
-              if (confirm("Voulez-vous vraiment supprimer ce parking ?")) {
-                deleteMutation.mutate(parking.id);
-              }
-            }}
-          />
+            className="bg-white p-6 rounded-3xl border border-tertiary/20 flex flex-col gap-4"
+          >
+            <div>
+              <h3 className="text-lg font-semibold text-secondary">
+                {parking.location}
+              </h3>
+              <p className="text-tertiary">
+                {parking.capacity} places
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => navigate(`/owner/parkings/${parking.id}/edit`)}
+                  size="sm"
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Modifier
+                </Button>
+                <Button
+                  onClick={() => navigate(`/owner/parkings/${parking.id}/rates`)}
+                  size="sm"
+                  className="flex-1"
+                >
+                  Tarifs
+                </Button>
+              </div>
+              <Button
+                onClick={() => {
+                  if (confirm("Voulez-vous vraiment supprimer ce parking ?")) {
+                    deleteMutation.mutate(parking.id);
+                  }
+                }}
+                size="sm"
+                variant="outline"
+                className="text-red-500 border-red-500 hover:bg-red-50"
+                disabled={deleteMutation.isPending}
+              >
+                Supprimer
+              </Button>
+            </div>
+          </div>
         ))}
 
         {parkings?.length === 0 && (
