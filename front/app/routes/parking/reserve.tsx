@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ChangeEvent, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
@@ -55,7 +55,7 @@ export default function ReserveParking() {
     return `${slot.hour.toString().padStart(2, "0")}:${slot.minute.toString().padStart(2, "0")}`;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -106,7 +106,7 @@ export default function ReserveParking() {
     );
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     if (newDate < minDate) return;
     setSelectedDate(newDate);

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import Navbar from "./Navbar";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactElement } from "react";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -13,7 +14,7 @@ const createTestQueryClient = () =>
     },
   });
 
-const renderWithProviders = (ui: React.ReactElement) => {
+const renderWithProviders = (ui: ReactElement) => {
   const testQueryClient = createTestQueryClient();
   return render(
     <QueryClientProvider client={testQueryClient}>

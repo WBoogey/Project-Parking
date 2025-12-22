@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import Button from "@/components/atoms/Button";
 import InputComplete from "@/components/molecules/InputComplete";
@@ -22,7 +22,7 @@ export default function EditParking() {
     }
   }, [parking]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!id || !location || !capacity) return;
 
