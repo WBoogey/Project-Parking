@@ -68,7 +68,7 @@ Système de parking partagé permettant aux propriétaires de louer leurs places
 
 ```bash
 # Cloner le repository
-git clone <url-du-repo>
+git clone https://github.com/WBoogey/Project-Parking.git
 cd Project-Parking
 
 # Créer le fichier d'environnement
